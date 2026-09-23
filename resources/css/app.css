@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+/* =========================================================
+   DAWN SOLUTIONS — GLOBAL DESIGN SYSTEM
+   ========================================================= */
+
+@theme {
+    /* Brand Blues */
+    --color-brand-blue-900: #1E3A66;
+    --color-brand-blue: #325A96;
+    --color-brand-blue-700: #2A4D80;
+    --color-brand-blue-100: #EAF0F9;
+
+    /* Brand Gold */
+    --color-brand-gold: #FAB40A;
+    --color-brand-gold-600: #DE9E00;
+
+    /* Neutral Colors */
+    --color-white: #FFFFFF;
+    --color-gray-50: #F4F5F7;
+    --color-gray-200: #E4E7EC;
+    --color-charcoal: #2B2B2B;
+    --color-charcoal-soft: #5B6470;
+}
+
+/* =========================================================
+   GLOBAL BASE STYLES
+   ========================================================= */
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--color-gray-50);
+        color: var(--color-charcoal);
+    }
+}
