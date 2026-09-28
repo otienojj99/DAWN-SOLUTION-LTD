@@ -54,6 +54,20 @@ class Products extends Model
         'stock_quantity'  => 0,
     ];
 
+        protected $appends = [
+        'is_in_stock',
+        'is_on_sale',
+        'effective_price',
+        'active_promotion_id',
+        'badge',
+        'discount_percent',
+    ];
+
+    public function getActivePromotionIdAttribute(): ?int
+    {
+        return $this->active_promotion?->id;
+    }
+
      /* ---------- Relations ---------- */
 
      public function category(): BelongsTo{
@@ -95,6 +109,47 @@ class Products extends Model
         );
     }
 
+    /* ---------- Phase 2 relations ---------- */
+
+    public function promotions(): BelongsToMany
+    {
+        return $this->belongsToMany(Promotion::class, 'product_promotion')
+                    ->withPivot([
+                        'override_value', 'override_value_usd',
+                        'max_uses_per_product', 'uses_count',
+                    ])
+                    ->withTimestamps();
+    }
+
+    /**
+     * Promotions inherited from this product's category (and optionally ancestors).
+     */
+    public function categoryPromotions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Promotion::class,
+            'category_promotion',
+            null, // resolved manually — not a direct FK to products
+            null
+        );
+    }
+
+    /**
+     * Bundle components (only meaningful when type = 'bundle').
+     */
+    public function bundleItems(): HasMany
+    {
+        return $this->hasMany(BundleItem::class, 'bundle_product_id')->ordered();
+    }
+
+    /**
+     * Products that include this product as a component in their bundle.
+     */
+    public function includedInBundles(): HasMany
+    {
+        return $this->hasMany(BundleItem::class, 'component_product_id');
+    }
+
      /* ---------- Scopes ---------- */
 
      public function scopeActive(Builder $q): Builder
@@ -115,6 +170,25 @@ class Products extends Model
     public function scopeFeatured(Builder $q): Builder
     {
         return $q->where('is_featured', true);
+    }
+        public function scopeOnDiscount(Builder $q): Builder
+    {
+        return $q->whereHas('promotions', fn ($p) => $p->live()->ofKind('discount'));
+    }
+
+    public function scopeOnClearance(Builder $q): Builder
+    {
+        return $q->whereHas('promotions', fn ($p) => $p->live()->ofKind('clearance'));
+    }
+
+    public function scopeWithLivePromotions(Builder $q): Builder
+    {
+        return $q->whereHas('promotions', fn ($p) => $p->live());
+    }
+
+    public function scopeBundles(Builder $q): Builder
+    {
+        return $q->where('type', 'bundle');
     }
 
     public function scopeInStock(Builder $q): Builder
@@ -176,6 +250,92 @@ class Products extends Model
     {
         return $this->compare_at_price !== null
             && (float) $this->compare_at_price > (float) $this->price;
+    }
+
+        /**
+     * The single highest-priority live promotion currently applying to this product,
+     * accounting for both direct and category-based promotions.
+     */
+    public function getActivePromotionAttribute(): ?Promotion
+    {
+        if ($this->relationLoaded('promotions')) {
+            $direct = $this->promotions->where('is_active', true);
+        } else {
+            $direct = $this->promotions()->live()->get();
+        }
+
+        return $direct->sortBy('priority')->first();
+    }
+
+    /**
+     * Effective price after applying the current promotion (if any).
+     */
+    public function getEffectivePriceAttribute(): float
+    {
+        $base = (float) $this->price;
+
+        if (! $promo = $this->active_promotion) {
+            return $base;
+        }
+
+        return $promo->applyTo($base, $promo->effectiveValueFor($this));
+    }
+
+    public function getEffectivePriceUsdAttribute(): ?float
+    {
+        $promo = $this->active_promotion;
+
+        if (! $promo) {
+            return $this->price_usd !== null
+                ? (float) $this->price_usd
+                : null;
+        }
+
+        $baseUsd = (float) ($this->price_usd ?? round((float) $this->price / config('shop.usd_rate', 130), 2));
+
+        return $promo->applyTo($baseUsd);
+    }
+
+    /**
+     * Badge for storefront cards — priority: out-of-stock > bundle > clearance > discount > new.
+     */
+    public function getBadgeAttribute(): ?array
+    {
+        if (! $this->is_in_stock) {
+            return ['label' => 'Out of Stock', 'color' => 'gray'];
+        }
+
+        if ($this->type === 'bundle') {
+            return ['label' => 'Best Deal', 'color' => 'green'];
+        }
+
+        if ($promo = $this->active_promotion) {
+            return [
+                'label' => $promo->display_badge_label,
+                'color' => $promo->display_badge_color,
+            ];
+        }
+
+        if ($this->published_at && $this->published_at->gt(now()->subDays(30))) {
+            return ['label' => 'New', 'color' => 'blue'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Discount percentage vs. compare_at_price, for card display.
+     */
+    public function getDiscountPercentAttribute(): ?int
+    {
+        $compare = (float) ($this->compare_at_price ?? 0);
+        $effective = $this->effective_price;
+
+        if ($compare <= 0 || $effective >= $compare) {
+            return null;
+        }
+
+        return (int) round((($compare - $effective) / $compare) * 100);
     }
 
 }

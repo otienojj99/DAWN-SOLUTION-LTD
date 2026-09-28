@@ -175,6 +175,14 @@ class Category extends Model
             ->orderBy('level');
     }
 
+    public function promotions(): BelongsToMany
+    {
+         return $this->belongsToMany(Promotion::class, 'category_promotion')
+                ->withPivot(['override_value', 'override_value_usd', 'include_descendants'])
+                ->withTimestamps();
+    }
+
+
     /**
      * Siblings (same parent, excluding self).
      */
