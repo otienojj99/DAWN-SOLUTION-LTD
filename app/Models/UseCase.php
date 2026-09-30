@@ -28,7 +28,7 @@ class UseCase extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_use_case');
+        return $this->belongsToMany(Products::class, 'product_use_case', 'use_case_id', 'product_id');
     }
 
     /* ---------- Scopes ---------- */

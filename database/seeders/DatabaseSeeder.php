@@ -21,5 +21,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+        CategorySeeder::class, 
+        BrandSeeder::class,
+        AttributeSeeder::class,
+        UseCaseSeeder::class,
+        PromotionSeeder::class,
+        DemoSeeder::class,
     }
 }

@@ -1,51 +1,201 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@source '../views';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-
 @custom-variant dark (&:is(.dark *));
 
 /* =========================================================
-   DAWN SOLUTIONS — GLOBAL DESIGN SYSTEM
-   ========================================================= */
+ |  DAWN SOLUTIONS — BRAND TOKENS (raw palette)
+ ========================================================= */
+:root {
+    /* Blues */
+    --brand-blue-900: #1e3a66;
+    --brand-blue:     #325a96;
+    --brand-blue-700: #2a4d80;
+    --brand-blue-100: #eaf0f9;
 
-@theme {
-    /* Brand Blues */
-    --color-brand-blue-900: #1E3A66;
-    --color-brand-blue: #325A96;
-    --color-brand-blue-700: #2A4D80;
-    --color-brand-blue-100: #EAF0F9;
+    /* Gold */
+    --brand-gold:     #fab40a;
+    --brand-gold-600: #de9e00;
 
-    /* Brand Gold */
-    --color-brand-gold: #FAB40A;
-    --color-brand-gold-600: #DE9E00;
+    /* Neutrals */
+    --brand-white:        #ffffff;
+    --brand-gray-50:      #f4f5f7;
+    --brand-gray-200:     #e4e7ec;
+    --brand-charcoal:     #2b2b2b;
+    --brand-charcoal-soft:#5b6470;
 
-    /* Neutral Colors */
-    --color-white: #FFFFFF;
-    --color-gray-50: #F4F5F7;
-    --color-gray-200: #E4E7EC;
-    --color-charcoal: #2B2B2B;
-    --color-charcoal-soft: #5B6470;
+    /* Status (keep for toasts, alerts) */
+    --brand-success: #16a34a;
+    --brand-warning: #f59e0b;
+    --brand-danger:  #dc2626;
+
+    /* ------------------------------------------------------
+     |  shadcn semantic tokens — mapped to brand
+     |  (light mode is default)
+     | ------------------------------------------------------ */
+
+    --background: var(--brand-gray-50);
+    --foreground: var(--brand-charcoal);
+
+    --card: var(--brand-white);
+    --card-foreground: var(--brand-charcoal);
+
+    --popover: var(--brand-white);
+    --popover-foreground: var(--brand-charcoal);
+
+    --primary: var(--brand-blue);
+    --primary-foreground: var(--brand-white);
+
+    --secondary: var(--brand-blue-100);
+    --secondary-foreground: var(--brand-blue-900);
+
+    --muted: var(--brand-gray-50);
+    --muted-foreground: var(--brand-charcoal-soft);
+
+    --accent: var(--brand-gold);
+    --accent-foreground: var(--brand-charcoal);
+
+    --destructive: var(--brand-danger);
+    --destructive-foreground: var(--brand-white);
+
+    --border: var(--brand-gray-200);
+    --input: var(--brand-gray-200);
+    --ring: var(--brand-blue);
+
+    /* Charts (kept for dashboard usage) */
+    --chart-1: var(--brand-blue);
+    --chart-2: var(--brand-gold);
+    --chart-3: var(--brand-blue-900);
+    --chart-4: var(--brand-blue-700);
+    --chart-5: var(--brand-blue-100);
+
+    --radius: 0.5rem;
+
+    /* Sidebar tokens (used by app-sidebar) */
+    --sidebar: var(--brand-blue-900);
+    --sidebar-foreground: var(--brand-white);
+    --sidebar-primary: var(--brand-gold);
+    --sidebar-primary-foreground: var(--brand-charcoal);
+    --sidebar-accent: rgba(255, 255, 255, 0.08);
+    --sidebar-accent-foreground: var(--brand-white);
+    --sidebar-border: rgba(255, 255, 255, 0.12);
+    --sidebar-ring: var(--brand-gold);
 }
 
 /* =========================================================
-   GLOBAL BASE STYLES
-   ========================================================= */
+ |  DARK MODE — optional, ready when you need it
+ ========================================================= */
+.dark {
+    --background: #0f1720;
+    --foreground: #f4f5f7;
 
+    --card: #17202c;
+    --card-foreground: #f4f5f7;
+
+    --popover: #17202c;
+    --popover-foreground: #f4f5f7;
+
+    --primary: var(--brand-gold);
+    --primary-foreground: var(--brand-charcoal);
+
+    --secondary: #1e2a3a;
+    --secondary-foreground: #f4f5f7;
+
+    --muted: #1e2a3a;
+    --muted-foreground: #9aa4b2;
+
+    --accent: var(--brand-blue);
+    --accent-foreground: #f4f5f7;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.12);
+    --ring: var(--brand-gold);
+
+    --sidebar: #0b121b;
+    --sidebar-foreground: #f4f5f7;
+    --sidebar-primary: var(--brand-gold);
+    --sidebar-primary-foreground: var(--brand-charcoal);
+    --sidebar-accent: rgba(255, 255, 255, 0.06);
+    --sidebar-accent-foreground: #f4f5f7;
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-ring: var(--brand-gold);
+}
+
+/* =========================================================
+ |  TAILWIND THEME — registers tokens as utilities
+ |  (Tailwind v4 @theme block)
+ ========================================================= */
+@theme inline {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system,
+                 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif,
+                    system-ui, sans-serif;
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Direct brand access when you want them raw */
+    --color-brand-blue: var(--brand-blue);
+    --color-brand-blue-900: var(--brand-blue-900);
+    --color-brand-blue-700: var(--brand-blue-700);
+    --color-brand-blue-100: var(--brand-blue-100);
+    --color-brand-gold: var(--brand-gold);
+    --color-brand-gold-600: var(--brand-gold-600);
+
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* =========================================================
+ |  BASE
+ ========================================================= */
 @layer base {
     * {
-        box-sizing: border-box;
-    }
-
-    html {
-        font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+        border-color: var(--border);
     }
 
     body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--color-gray-50);
-        color: var(--color-charcoal);
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4 {
+        font-family: var(--font-display);
+        font-weight: 600;
+        letter-spacing: -0.01em;
     }
 }

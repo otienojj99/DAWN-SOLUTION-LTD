@@ -21,7 +21,7 @@ class AttributeValues extends Model
 
     public function attribute(): BelongsTo
     {
-        return $this->belongsTo(Attribute::class);
+        return $this->belongsTo(Attributes::class);
     }
 
     public function variants(): BelongsToMany

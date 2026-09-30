@@ -24,8 +24,32 @@ enum ApiErrorCode: string
     case CATEGORY_DUPLICATE_SLUG    = 'CATEGORY_DUPLICATE_SLUG';
 
     // Domain — Products (add as you go)
-    case PRODUCT_NOT_FOUND          = 'PRODUCT_NOT_FOUND';
-    case PRODUCT_OUT_OF_STOCK       = 'PRODUCT_OUT_OF_STOCK';
+    case PRODUCT_NOT_FOUND              = 'PRODUCT_NOT_FOUND';
+    case PRODUCT_OUT_OF_STOCK           = 'PRODUCT_OUT_OF_STOCK';
+    case PRODUCT_SKU_DUPLICATE          = 'PRODUCT_SKU_DUPLICATE';
+    case PRODUCT_SLUG_DUPLICATE         = 'PRODUCT_SLUG_DUPLICATE';
+    case PRODUCT_TYPE_CHANGE_FORBIDDEN  = 'PRODUCT_TYPE_CHANGE_FORBIDDEN';
+    case PRODUCT_HAS_ORDERS             = 'PRODUCT_HAS_ORDERS';
+    case PRODUCT_NOT_PUBLISHED          = 'PRODUCT_NOT_PUBLISHED';
+
+    // Domain — Variants
+    case VARIANT_NOT_FOUND              = 'VARIANT_NOT_FOUND';
+    case VARIANT_SKU_DUPLICATE          = 'VARIANT_SKU_DUPLICATE';
+    case VARIANT_REQUIRED_ATTRS_MISSING = 'VARIANT_REQUIRED_ATTRS_MISSING';
+    case VARIANT_DEFAULT_REQUIRED       = 'VARIANT_DEFAULT_REQUIRED';
+
+    // Domain — Bundles
+    case BUNDLE_REQUIRES_COMPONENTS     = 'BUNDLE_REQUIRES_COMPONENTS';
+    case BUNDLE_CANNOT_CONTAIN_ITSELF   = 'BUNDLE_CANNOT_CONTAIN_ITSELF';
+    case BUNDLE_CANNOT_CONTAIN_BUNDLE   = 'BUNDLE_CANNOT_CONTAIN_BUNDLE';
+
+    // Domain — Images
+    case IMAGE_PRIMARY_REQUIRED         = 'IMAGE_PRIMARY_REQUIRED';
+    case IMAGE_UPLOAD_FAILED            = 'IMAGE_UPLOAD_FAILED';
+
+    // Domain — Promotions / Use cases
+    case PROMOTION_NOT_FOUND            = 'PROMOTION_NOT_FOUND';
+    case USE_CASE_NOT_FOUND             = 'USE_CASE_NOT_FOUND';
 
     // Domain — Auth / Users
     case INVALID_CREDENTIALS        = 'INVALID_CREDENTIALS';
@@ -45,6 +69,24 @@ enum ApiErrorCode: string
             self::NOT_FOUND,
             self::CATEGORY_NOT_FOUND,
             self::PRODUCT_NOT_FOUND    => 404,
+            self::VARIANT_NOT_FOUND,
+            self::PROMOTION_NOT_FOUND,
+            self::USE_CASE_NOT_FOUND          => 404,
+
+            self::PRODUCT_SKU_DUPLICATE,
+            self::PRODUCT_SLUG_DUPLICATE,
+            self::VARIANT_SKU_DUPLICATE,
+            self::PRODUCT_HAS_ORDERS,
+            self::PRODUCT_TYPE_CHANGE_FORBIDDEN,
+            self::BUNDLE_REQUIRES_COMPONENTS,
+            self::BUNDLE_CANNOT_CONTAIN_ITSELF,
+            self::BUNDLE_CANNOT_CONTAIN_BUNDLE,
+            self::PRODUCT_OUT_OF_STOCK,
+            self::IMAGE_PRIMARY_REQUIRED       => 409,
+
+            self::PRODUCT_NOT_PUBLISHED,
+            self::VARIANT_REQUIRED_ATTRS_MISSING,
+            self::VARIANT_DEFAULT_REQUIRED     => 422,
             self::METHOD_NOT_ALLOWED   => 405,
             self::CATEGORY_DUPLICATE_SLUG,
             self::CATEGORY_HAS_CHILDREN,

@@ -109,11 +109,16 @@ class Products extends Model
         );
     }
 
+    public function useCases(): BelongsToMany
+    {
+        return $this->belongsToMany(UseCase::class, 'product_use_case', 'product_id', 'use_case_id');
+    }
+
     /* ---------- Phase 2 relations ---------- */
 
     public function promotions(): BelongsToMany
     {
-        return $this->belongsToMany(Promotion::class, 'product_promotion')
+        return $this->belongsToMany(Promotions::class, 'product_promotions', 'product_id', 'promotion_id')
                     ->withPivot([
                         'override_value', 'override_value_usd',
                         'max_uses_per_product', 'uses_count',
@@ -127,7 +132,7 @@ class Products extends Model
     public function categoryPromotions(): BelongsToMany
     {
         return $this->belongsToMany(
-            Promotion::class,
+            Promotions::class,
             'category_promotion',
             null, // resolved manually — not a direct FK to products
             null
@@ -139,7 +144,7 @@ class Products extends Model
      */
     public function bundleItems(): HasMany
     {
-        return $this->hasMany(BundleItem::class, 'bundle_product_id')->ordered();
+        return $this->hasMany(BundleItems::class, 'bundle_product_id')->ordered();
     }
 
     /**
@@ -147,7 +152,7 @@ class Products extends Model
      */
     public function includedInBundles(): HasMany
     {
-        return $this->hasMany(BundleItem::class, 'component_product_id');
+        return $this->hasMany(BundleItems::class, 'component_product_id');
     }
 
      /* ---------- Scopes ---------- */

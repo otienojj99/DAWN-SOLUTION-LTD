@@ -70,44 +70,48 @@ class Category extends Model
 
     protected static function booted(): void
     {
-        static::saving(function (self $category){
-             // Auto-slug from name if slug empty
-             if(empty($category->slug) && !empty($category->name)){
-                $category->slug = \Str::slug($category->name);
-             }
+        static::saving(function (self $category) {
+            // Auto-slug from name if slug empty
+            if (empty($category->slug) && ! empty($category->name)) {
+                $category->slug = Str::slug($category->name);
+            }
 
-               // Enforce max depth
+            // Resolve parent level + path once
+            $parentLevel = null;
+            $parentPath  = null;
 
-               if($category->parent_id){
-                $parent_level = static::query()->wnereKey($category->parent_id)->value('level');
+            if ($category->parent_id) {
+                $parent = static::query()->find($category->parent_id);
 
-                if($parent_level !== null && $parent_level>= self::MAX_LEVEL){
-                   throw new \RuntimeException(
-                        'Cannot create a category deeper than level ' . self::MAX_LEVEL . '.'
-                    );
+                if ($parent) {
+                    $parentLevel = (int) $parent->level;
+                    $parentPath  = $parent->path;
                 }
+            }
 
-                $category->level = (int) $parentLevel + 1;
-               }else{
-                  $category->level = self::LEVEL_PARENT;
-               }
+            // Enforce max depth
+            if ($parentLevel !== null && $parentLevel >= self::MAX_LEVEL) {
+                throw new \RuntimeException(
+                    'Cannot create a category deeper than level ' . self::MAX_LEVEL . '.'
+                );
+            }
 
-                // Build path
+            // Assign level
+            $category->level = $parentLevel !== null
+                ? $parentLevel + 1
+                : self::LEVEL_PARENT;
 
-                $parentPath = $category->parent_id  ? static::query()->whereKey($category->parent_id)->value('path') : null;
-
-                $category->path = $parentPath ? $parentPath . self::PATH_SEPERATOR . $category->slug
-                                  : $category->slug;
+            // Build path
+            $category->path = $parentPath
+                ? $parentPath . self::PATH_SEPARATOR . $category->slug
+                : $category->slug;
         });
 
-         static::saved(function (self $category){
-             // If slug or path changed, cascade to children so their paths stay valid
-
-             if($category->wasChanged(['slug', 'path'])){
-               $category->cascadePathToDescendants();
-             }
-         });
-
+        static::saved(function (self $category) {
+            if ($category->wasChanged(['slug', 'path'])) {
+                $category->cascadePathToDescendants();
+            }
+        });
     }
 
       /* =========================================================
@@ -174,6 +178,7 @@ class Category extends Model
             ->whereIn('path', $paths)
             ->orderBy('level');
     }
+    
 
     public function promotions(): BelongsToMany
     {

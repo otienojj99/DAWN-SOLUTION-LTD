@@ -65,7 +65,7 @@ class Promotions extends Model
 
     public function products(): BelongsToMany 
     {
-        return $this->belongsToMany(Product::class, 'product_promotion')
+        return $this->belongsToMany(Products::class, 'product_promotions', 'promotion_id', 'product_id')
                     ->withPivot([
                         'override_value', 'override_value_usd',
                         'max_uses_per_product', 'uses_count',
@@ -76,7 +76,7 @@ class Promotions extends Model
 
     public function categories() : BelongsToMany
     {
-         return $this->belongsToMany(Category::class, 'category_promotion')
+            return $this->belongsToMany(Category::class, 'category_promotions', 'promotion_id', 'category_id')
                     ->withPivot(['override_value', 'override_value_usd', 'include_descendants'])
                     ->withTimestamps();
     }
