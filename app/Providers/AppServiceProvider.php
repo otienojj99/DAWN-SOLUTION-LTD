@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\UseCase;
+use App\Observers\UseCaseObserver;
+use App\Observers\CategoryObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        Category::observe(CategoryObserver::class);
+        UseCase::observe(UseCaseObserver::class);
     }
 
     /**

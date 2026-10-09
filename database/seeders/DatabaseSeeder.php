@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
         UseCaseSeeder::class,
         PromotionSeeder::class,
         DemoSeeder::class,
+        HomepagePromoSeeder::class,
     }
 }

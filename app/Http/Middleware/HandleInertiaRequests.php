@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\UseCase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -33,19 +35,66 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
-    public function share(Request $request): array
-    {
-        $user = $request->user();
+  public function share(Request $request): array
+{
+    return array_merge(parent::share($request), [
 
-        return [
-            ...parent::share($request),
-            'name' => config('app.name'),
-            'auth' => [
-                'user' => $user,
-            ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-            'currentTeam' => fn () => $user?->currentTeam ? $user->toUserTeam($user->currentTeam) : null,
-            'teams' => fn () => $user?->toUserTeams(includeCurrent: true) ?? [],
-        ];
-    }
+        'auth' => [
+            'user' => $request->user() ? [
+                'id'    => $request->user()->id,
+                'name'  => $request->user()->name,
+                'email' => $request->user()->email,
+            ] : null,
+        ],
+
+        'useCases' => fn () => Cache::remember(
+            'storefront.use_cases',
+            now()->addHour(),
+            fn () => \App\Models\UseCase::query()
+                ->active()
+                ->ordered()
+                ->get(['id', 'name', 'slug', 'icon', 'color'])
+                ->map(fn ($u) => [
+                    'id'    => $u->id,
+                    'name'  => $u->name,
+                    'slug'  => $u->slug,
+                    'icon'  => $u->icon,
+                    'color' => $u->color,
+                    'href'  => '/shop/shop-by/' . $u->slug,
+                ])
+                ->values()
+                ->all()
+        ),
+
+        'categoryTree' => fn () => Cache::remember(
+            'storefront.category_tree',
+            now()->addHour(),
+            fn () => \App\Models\Category::query()
+                ->active()
+                ->parents()
+                ->ordered()
+                ->with(['children' => fn ($q) => $q->active()->ordered()])
+                ->get(['id', 'name', 'slug', 'path', 'level'])
+                ->map(fn ($parent) => [
+                    'id'       => $parent->id,
+                    'name'     => $parent->name,
+                    'slug'     => $parent->slug,
+                    'href'     => '/shop/categories/' . $parent->slug,
+                    'children' => $parent->children->map(fn ($child) => [
+                        'id'   => $child->id,
+                        'name' => $child->name,
+                        'slug' => $child->slug,
+                        'href' => '/shop/categories/' . $child->slug,
+                    ])->values()->all(),
+                ])
+                ->values()
+                ->all()
+        ),
+
+        'flash' => [
+            'success' => fn () => $request->session()->get('success'),
+            'error'   => fn () => $request->session()->get('error'),
+        ],
+    ]);
+}
 }

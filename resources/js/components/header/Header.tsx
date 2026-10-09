@@ -1,11 +1,13 @@
+import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { UtilityBar } from './UtilityBar';
 import { AnnouncementBar } from './AnnouncementBar';
 import { MainHeader } from './MainHeader';
 import { CategoryNavigation } from './CategoryNavigation';
 import { MobileNavigation } from './MobileNavigation';
-import { categories } from '@/data/categories';
+// import { categories } from '@/data/categories';
 import { announcements } from '@/data/announcements';
+import { toNavCategories } from '@/types/adapters';
 
 export interface HeaderProps {
     logoSrc?: string;
@@ -14,6 +16,14 @@ export interface HeaderProps {
     /** Pass the authenticated user's display name; omit to show "Sign In". */
     userName?: string;
     onSearch?: (query: string) => void;
+}
+
+interface CategoryProp {
+    id: number;
+    name: string;
+    slug: string;
+    href: string;
+    children?: CategoryProp[];
 }
 
 /**
@@ -36,6 +46,8 @@ export interface HeaderProps {
  *   />
  */
 export function Header({ logoSrc, wishlistCount, cartCount, userName, onSearch }: HeaderProps) {
+    const { categoryTree } = usePage<{ categoryTree: CategoryProp[] }>().props;
+    const navCategories = toNavCategories(categoryTree);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     return (
@@ -50,10 +62,10 @@ export function Header({ logoSrc, wishlistCount, cartCount, userName, onSearch }
                 onSearch={onSearch}
                 onOpenMobileMenu={() => setMobileNavOpen(true)}
             />
-            <CategoryNavigation categories={categories} />
+            <CategoryNavigation categories={navCategories} />
 
             <MobileNavigation
-                categories={categories}
+                categories={navCategories}
                 open={mobileNavOpen}
                 onClose={() => setMobileNavOpen(false)}
             />

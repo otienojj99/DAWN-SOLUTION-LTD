@@ -1,9 +1,14 @@
 <?php
 use App\Http\Controllers\Api\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Api\Storefront\CategoryController as StorefrontCategoryController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Api\Storefront\CategoryController as StorefrontCategoryController;
+use App\Http\Controllers\Api\Storefront\CollectionController;
+use App\Http\Controllers\Api\Storefront\CollectionRegistry;
 use App\Http\Controllers\Api\Storefront\ProductController as StorefrontProductController;
+use App\Http\Controllers\Api\Storefront\UseCaseController as StorefrontUseCaseController;
+use App\Http\Controllers\Api\Storefront\CategoryDealsController;
+use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +54,8 @@ Route::prefix('admin')
 
 
 Route::prefix('storefront')->group(function () {
+    Route::get('categories/{categorySlug}/deals/{promotionSlug}', CategoryDealsController::class)
+    ->name('categories.deals');
     Route::get('categories', [StorefrontCategoryController::class, 'index']);
     Route::get('categories/tree', [StorefrontCategoryController::class, 'tree']);
     Route::get('categories/{category}', [StorefrontCategoryController::class, 'show']);
@@ -61,6 +68,21 @@ Route::prefix('storefront')->group(function () {
 
     Route::get('products', [StorefrontProductController::class, 'index']);
     Route::get('products/{product:slug}', [StorefrontProductController::class, 'show']);
+    
+
+    // Use Cases
+    Route::get('shop-by/{slug}', [StorefrontUseCaseController::class, 'show'])
+           ->name('use-cases.show');
+    
+    Route::get('deals/{slug}', CollectionController::class)
+    ->whereIn('slug', CollectionRegistry::slugs())
+    ->name('deals.show');
+
+    Route::get('new-arrivals', CollectionController::class)
+    ->defaults('slug', 'new-arrivals')
+    ->name('new-arrivals');
+
+
 });
 
 

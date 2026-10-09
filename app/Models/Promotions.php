@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,6 +22,8 @@ class Promotions extends Model
         'scope',
         'badge_label', 'badge_color', 'show_on_storefront',
         'starts_at', 'ends_at', 'is_active',
+        'show_on_homepage', 'homepage_category_id', 'homepage_sort_order', 'homepage_size',
+        'hero_image_path', 'hero_image_alt', 'hero_tag', 'hero_title', 'hero_subtitle', 'hero_cta_label',
     ];
 
     protected $casts = [
@@ -39,6 +43,8 @@ class Promotions extends Model
         'is_active'             => 'boolean',
         'starts_at'             => 'datetime',
         'ends_at'               => 'datetime',
+        'show_on_homepage'    => 'boolean',
+        'homepage_sort_order' => 'integer',
     ];
 
     protected $attributes = [
@@ -81,10 +87,25 @@ class Promotions extends Model
                     ->withTimestamps();
     }
 
+    public function homepageCategory(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'homepage_category_id');
+    }
+
      /* ---------- Scopes ---------- */
     public function scopeActive(Builder $q) : Builder
     {
         return $q-where('is_active', true);
+    }
+
+    public function scopeOnHomepage(Builder $q): Builder
+    {
+        return $q->where('show_on_homepage', true)
+                 ->where('is_active', true)
+                ->where(fn ($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
+                ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>=', now()))
+                ->orderBy('homepage_sort_order')
+                ->orderBy('id');
     }
 
 
@@ -204,5 +225,50 @@ class Promotions extends Model
             'bogo'       => 'pink',
             default      => 'amber',
         };
+    }
+
+
+    public function getHeroImageUrlAttribute(): ?string
+    {
+        return $this->hero_image_path
+            ? asset('storage/' . ltrim($this->hero_image_path, '/'))
+            : null;
+    }
+
+    public function getResolvedHeroTitleAttribute(): ?string
+    {
+        return $this->hero_title ?? $this->name;
+    }
+
+    public function getResolvedHeroSubtitleAttribute(): ?string
+    {
+        return $this->hero_subtitle ?? $this->description;
+    }
+
+    public function getResolvedHeroTagAttribute(): ?string
+    {
+        return $this->hero_tag ?? $this->display_badge_label;
+    }
+
+    public function getResolvedHeroCtaLabelAttribute(): string
+    {
+        return $this->hero_cta_label ?? 'Shop Now';
+    }
+
+    /**
+     * Where the homepage card links to.
+     * - If a homepage_category_id is set → SEO-friendly /categories/{cat}/deals/{promo}
+     * - Otherwise → generic /deals/{promo}
+     */
+    public function getHomepageHrefAttribute(): string
+    {
+        if ($this->homepage_category_id && $this->homepageCategory) {
+            return '/shop/categories/'
+                . $this->homepageCategory->slug
+                . '/deals/'
+                . $this->slug;
+        }
+
+        return '/shop/deals/' . $this->slug;
     }
 }
