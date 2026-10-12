@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use \App\Models\Product;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -20,6 +23,7 @@ class Category extends Model
         'level',
         'sort_order',
         'is_active',
+        'image_path', 'image_alt',
      ];
 
      /* =========================================================
@@ -201,6 +205,11 @@ class Category extends Model
             ->whereKeyNot($this->getKey())
             ->orderBy('sort_order')
             ->orderBy('name');
+    }
+
+    public function products(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Products::class, 'category_id');
     }
 
     /* =========================================================
@@ -399,5 +408,37 @@ class Category extends Model
             $node->setRelation('children', static::tree($node->id, $activeOnly));
         });
     }
+
+
+   public function getImageUrlAttribute(): ?string 
+   {
+     if (! $this->image_path) {
+        return null;
+    }
+
+    $diskPath = storage_path('app/public/' . ltrim($this->image_path, '/'));
+
+    return file_exists($diskPath)
+        ? asset('storage/' . ltrim($this->image_path, '/'))
+        : null;
+   }
+
+
+   public function productsCountInSubtree(bool $visibleOnly = true): int
+    {
+        $ids = $this->descendants()->pluck('id')->push($this->id);
+
+        $query = \App\Models\Products::query()->whereIn('category_id', $ids);
+
+        if ($visibleOnly) {
+            $query->visible();
+        }
+
+        return $query->count();
+    }
+
+
+
+   
 
 }

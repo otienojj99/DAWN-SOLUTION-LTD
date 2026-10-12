@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\Promotions;
+use App\Models\Category;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,7 +32,26 @@ class HomeController extends Controller
             ])
             ->values();
 
+
+        $shopCategories = Category::query()
+            ->active()
+            ->parents()
+            ->ordered()
+            ->get(['id', 'name', 'slug', 'image_path', 'image_alt'])
+            ->map(fn (Category $cat) => [
+                'id'           => (string) $cat->id,
+                'label'        => $cat->name,
+                'href'         => '/shop/categories/' . $cat->slug,
+                'image'        => $cat->image_url,
+                'imageAlt'     => $cat->image_alt,
+                'productCount' => $cat->productsCountInSubtree(),
+                'badge'        => null,
+            ])
+            ->values()
+            ->all();
+
         return Inertia::render('storefront/home', [
+            'shopCategories' => $shopCategories,
             'promoOffers' => $promoOffers,
         ]);
     }

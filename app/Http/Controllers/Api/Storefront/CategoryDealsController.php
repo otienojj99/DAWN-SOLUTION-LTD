@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Storefront;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
-use App\Models\Product;
+use App\Models\Products;
 use App\Models\Promotions;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -69,7 +69,7 @@ class CategoryDealsController extends Controller {
 
 
         // 6. Products in the subtree that are affected by the promo
-        $query = Product::query()
+        $query = Products::query()
             ->visible()
             ->whereIn('category_id', $descendantIds)
             // ->where(function ($q) use ($directProductIds, $affectedCategoryIds) {

@@ -3,6 +3,8 @@ export interface ProductSpec {
     value: string;
 }
 
+export type ProductBadge = 'sale' | 'new' | 'bestseller' | 'corporate';
+
 /**
  * A real, linkable product. This is the shape the hero carousel, product
  * cards, and (eventually) the shop grid all consume — one definition shared
@@ -15,6 +17,7 @@ export interface Product {
     slug: string;
     name: string;
     brand: string;
+    /** Top-level category label, used by the best-sellers tabs (e.g. "Laptops"). */
     category: string;
     image: string;
     price: number;
@@ -24,4 +27,9 @@ export interface Product {
     rating?: number;
     reviewCount?: number;
     inStock?: boolean;
+    /** When set and low (<= 5), cards show an urgency "Only N left" message. */
+    stockCount?: number;
+    badge?: ProductBadge;
+    /** Marks the product as a best seller for the BestSellersSection. */
+    bestSeller?: boolean;
 }
