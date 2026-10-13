@@ -1,11 +1,12 @@
 import { ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
-import { productHref } from '@/data/products';
+import { productHref } from '@/lib/routes';
 import { discountPercent, formatPrice } from '@/lib/format';
 import type { Product } from '@/types/product';
 import { ProductBadge } from './ProductBadge';
 import { RatingStars } from './RatingStars';
 import { WishlistToggle } from './WishlistToggle';
+
 
 interface ProductCardProps {
     product: Product;
@@ -43,17 +44,23 @@ export function ProductCard({ product, onAddToCart, onToggleWishlist, className 
         >
             <div className="relative h-44 overflow-hidden bg-[#F4F5F7]">
                 <a href={href} tabIndex={-1} aria-hidden="true" className="block h-full">
-                    <img
-                        src={product.image}
-                        alt=""
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.07] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                    />
+                    {product.image ? (
+    <img
+        src={product.image}
+        alt=""
+        loading="lazy"
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.07] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+    />
+) : (
+    <span className="flex h-full w-full items-center justify-center bg-[#F4F5F7] text-[11px] font-semibold text-[#5B6470]">
+        No image
+    </span>
+)}
                 </a>
 
                 {product.badge && (
                     <span className="absolute left-2.5 top-2.5">
-                        <ProductBadge badge={product.badge} discountPercent={savePercent} />
+                        <ProductBadge badge={product.badge} />
                     </span>
                 )}
                 <span className="absolute right-2.5 top-2.5">
@@ -70,7 +77,7 @@ export function ProductCard({ product, onAddToCart, onToggleWishlist, className 
                     </a>
                 </h3>
 
-                {product.rating !== undefined && (
+                {product.rating != null && (
                     <div className="mb-3">
                         <RatingStars rating={product.rating} reviewCount={product.reviewCount} />
                     </div>

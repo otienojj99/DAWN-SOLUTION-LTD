@@ -2,6 +2,7 @@ import {Header} from '@/components/header/Header';
 import { HeroSection, QuickCategoryStrip } from '@/components/hero';
 import { PromoSection } from '@/components/promotion';
 import type { PromoOffer } from '@/types/promo';
+import type { Product } from '@/types/product';
 import type { Category } from '@/types/category';
 import type { ShopCategory } from '@/types/category';
 import { ShopByCategory } from '@/components/category/ShopByCategory';
@@ -11,10 +12,12 @@ type Props = {
     promoOffers: PromoOffer[];
     // categoryTree: Category[];
     shopCategories: ShopCategory[];
+
+    bestSellers: Product[];
 };
 
 
-export default function Home({ promoOffers, shopCategories }: Props) {
+export default function Home({ promoOffers, shopCategories, bestSellers }: Props) {
 
     
     return (
@@ -25,7 +28,7 @@ export default function Home({ promoOffers, shopCategories }: Props) {
                 <QuickCategoryStrip />
                 <PromoSection offers={promoOffers} />
                 <ShopByCategory categories={shopCategories}/>
-                <BestSellersSection />
+                <BestSellersSection  products={bestSellers}/>
         </>
     )
 }

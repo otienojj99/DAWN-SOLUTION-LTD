@@ -3,7 +3,10 @@ export interface ProductSpec {
     value: string;
 }
 
-export type ProductBadge = 'sale' | 'new' | 'bestseller' | 'corporate';
+export interface ProductBadge {
+    label: string;
+    color: string;
+}
 
 /**
  * A real, linkable product. This is the shape the hero carousel, product
@@ -24,7 +27,7 @@ export interface Product {
     oldPrice?: number;
     currency?: string;
     specs: ProductSpec[];
-    rating?: number;
+    rating?: number | null;
     reviewCount?: number;
     inStock?: boolean;
     /** When set and low (<= 5), cards show an urgency "Only N left" message. */

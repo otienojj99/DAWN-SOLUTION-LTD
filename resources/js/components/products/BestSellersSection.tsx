@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { products as allProducts } from '@/data/products';
+// import { products as allProducts } from '@/data/products';
 import { useScrollCarousel } from '@/hooks/useScrollCarousel';
 import type { Product } from '@/types/product';
 import { FilterTabs } from '@/components/common/FilterTabs';
@@ -11,8 +11,7 @@ const ALL_TAB = 'All';
 const PANEL_ID = 'best-sellers-panel';
 
 interface BestSellersSectionProps {
-    /** Defaults to the demo catalog, filtered to products flagged `bestSeller`. */
-    products?: Product[];
+    products: Product[];     // ← required, no default
     title?: string;
     description?: string;
     onAddToCart?: (product: Product) => void;
@@ -26,7 +25,7 @@ interface BestSellersSectionProps {
  * automatically. Switching tabs resets the row to the start.
  */
 export function BestSellersSection({
-    products = allProducts.filter((p) => p.bestSeller),
+    products,
     title = 'Best-Selling Products',
     description = 'Top picks our customers keep coming back for',
     onAddToCart,
@@ -45,6 +44,9 @@ export function BestSellersSection({
     useEffect(() => {
         reset();
     }, [activeTab, reset]);
+
+
+    if (!products.length) return null;
 
     return (
         <section aria-labelledby="best-sellers-heading" className="bg-[#F4F5F7]">

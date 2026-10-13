@@ -24,6 +24,7 @@ class Products extends Model
         'weight', 'dimensions',
         'is_active', 'is_featured', 'published_at',
         'meta_title', 'meta_description',
+        'is_best_seller',
     ];
 
     protected $casts = [
@@ -42,6 +43,7 @@ class Products extends Model
         'is_active'         => 'boolean',
         'is_featured'       => 'boolean',
         'published_at'      => 'datetime',
+        'is_best_seller' => 'boolean',
     ];
 
     protected $attributes = [
@@ -81,12 +83,12 @@ class Products extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImages::class)->ordered();
+        return $this->hasMany(ProductImages::class, 'product_id')->ordered();
     }
 
     public function primaryImage(): HasMany
     {
-        return $this->hasMany(ProductImages::class)->where('is_primary', true);
+        return $this->hasMany(ProductImages::class, 'product_id')->where('is_primary', true);
     }
 
     public function variants(): HasMany
@@ -194,6 +196,11 @@ class Products extends Model
     public function scopeBundles(Builder $q): Builder
     {
         return $q->where('type', 'bundle');
+    }
+
+    public function scopeBestSellers(Builder $q): Builder
+    {
+        return $q->where('is_best_seller', true);
     }
 
     public function scopeInStock(Builder $q): Builder

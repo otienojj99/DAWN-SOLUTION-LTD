@@ -2,23 +2,25 @@ import type { ProductBadge as ProductBadgeType } from '@/types/product';
 
 interface ProductBadgeProps {
     badge: ProductBadgeType;
-    /** For `sale` badges, the discount percentage to show (e.g. 15 → "-15%"). */
-    discountPercent?: number | null;
 }
 
-const styles: Record<ProductBadgeType, { className: string; text: string }> = {
-    sale: { className: 'bg-[#E14B4B] text-white', text: 'Sale' },
-    new: { className: 'bg-[#325A96] text-white', text: 'New' },
-    bestseller: { className: 'bg-[#FAB40A] text-[#152B4D]', text: 'Best Seller' },
-    corporate: { className: 'bg-[#152B4D] text-[#FAB40A]', text: 'Corporate Pick' },
+const styles: Record<string, string> = {
+    red: 'bg-[#E14B4B] text-white',
+    orange: 'bg-[#E97826] text-white',
+    amber: 'bg-[#FAB40A] text-[#152B4D]',
+    yellow: 'bg-[#FAB40A] text-[#152B4D]',
+    green: 'bg-[#1E9E5A] text-white',
+    blue: 'bg-[#325A96] text-white',
+    purple: 'bg-[#7554A6] text-white',
+    pink: 'bg-[#C44575] text-white',
+    gray: 'bg-[#5B6470] text-white',
 };
 
 /** Small corner badge on product cards. */
-export function ProductBadge({ badge, discountPercent }: ProductBadgeProps) {
-    const { className, text } = styles[badge];
-    const label = badge === 'sale' && discountPercent ? `-${discountPercent}%` : text;
+export function ProductBadge({ badge }: ProductBadgeProps) {
+    const className = styles[badge.color.toLowerCase()] ?? styles.gray;
 
     return (
-        <span className={`rounded px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${className}`}>{label}</span>
+        <span className={`rounded px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${className}`}>{badge.label}</span>
     );
 }
