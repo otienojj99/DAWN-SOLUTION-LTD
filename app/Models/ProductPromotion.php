@@ -19,12 +19,12 @@ class ProductPromotion extends Model
 
     public function bundle(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'bundle_product_id');
+        return $this->belongsTo(Products::class, 'bundle_product_id');
     }
 
     public function component(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'component_product_id');
+        return $this->belongsTo(Products::class, 'component_product_id');
     }
 
     public function variant(): BelongsTo

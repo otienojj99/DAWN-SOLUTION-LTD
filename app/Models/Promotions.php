@@ -169,7 +169,7 @@ class Promotions extends Model
     /**
      * Effective value for a specific product, honoring pivot override.
      */
-    public function effectiveValueFor(Product $product): float
+    public function effectiveValueFor(Products $product): float
     {
         $pivot = $product->promotions->firstWhere('id', $this->id)?->pivot;
 

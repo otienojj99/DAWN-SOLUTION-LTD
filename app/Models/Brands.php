@@ -33,4 +33,9 @@ class Brands extends Model
     {
         return $q->orderBy('sort_order')->orderBy('name');
     }
+
+    public function canBeDeleted(): bool
+    {
+        return ! $this->products()->exists();
+    }
 }

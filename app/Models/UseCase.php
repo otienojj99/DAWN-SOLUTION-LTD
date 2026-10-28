@@ -11,7 +11,7 @@ class UseCase extends Model
     //
     protected $fillable = [
         'name', 'slug', 'description', 'icon',
-        'color', 'sort_order', 'is_active',
+        'color', 'sort_order', 'is_active', 'image_path', 'image_alt', 'cta_label',
     ];
 
     protected $casts = [
@@ -41,5 +41,19 @@ class UseCase extends Model
     public function scopeOrdered(Builder $q): Builder
     {
         return $q->orderBy('sort_order')->orderBy('name');
+    }
+
+
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if( ! $this->image_path) return null;
+
+            $diskPath = storage_path('app/public/' . ltrim($this->image_path, '/'));
+
+            return file_exists($diskPath)
+            ? asset('storage/' . ltrim($this->image_path, '/'))
+            : null;
+        });
     }
 }

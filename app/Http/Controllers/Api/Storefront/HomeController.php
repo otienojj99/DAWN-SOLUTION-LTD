@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Promotions;
 use App\Models\Category;
 use App\Models\Products;
+use App\Models\Brands;
+use App\Models\UseCase;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,10 +65,88 @@ class HomeController extends Controller
             ->values()
             ->all();
 
+        $brands = Brands::query()
+        ->active()
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get(['id', 'name', 'slug', 'logo_path'])
+        ->map(fn (Brands $b) => [
+            'id'    => (string) $b->id,
+            'name'  => $b->name,
+            'logo'  => $b->logo_url,
+            'href'  => '/shop/brands/' . $b->slug,
+        ])
+        ->values()
+        ->all();
+
+    $useCases = UseCase::query()
+        ->active()
+        ->ordered()
+        ->withCount('products')
+        ->get(['id', 'name', 'slug', 'description', 'icon', 'color', 'image_path', 'image_alt', 'cta_label'])
+        ->map(fn (UseCase $u) => [
+            'id'             => $u->id,
+            'title'          => $u->name,
+            'description'    => $u->description,
+            'ctaLabel'       => $u->cta_label ?? 'Shop Now',
+            'href'           => '/shop/shop-by/' . $u->slug,
+            'image'          => $u->image_url,
+            'imageAlt'       => $u->image_alt,
+            'icon'           => $u->icon,           // string key, resolved on frontend
+            'color'          => $u->color,
+            'itemCount'      => (int) $u->products_count,
+        ])
+    ->values()
+    ->all();
+
+    $clearancePromo = Promotions::query()
+          -> live()
+          ->ofKind('clearance')
+          ->orderByDesc('ends_at')
+          ->first();
+
+    $deals = $clearancePromo
+    ? Products::query()
+         ->visible()
+         ->onClearance()
+         ->with(['brand:id,name', 'primaryImage'])
+         ->orderByRaw('(compare_at_price - price) / compare_at_price DESC')
+         ->limit(4)
+         ->get()
+
+         ->map(fn (Products $p) => [
+             'id'              => (string) $p->id,
+            'brand'           => $p->brand?->name ?? 'Unknown',
+            'name'            => $p->name,
+            'image'           => $p->primaryImage->first()?->url,
+            'discountPercent' => $p->discount_percent ?? 0,
+            'priceNow'        => (float) $p->effective_price,
+            'priceOld'        => $p->compare_at_price !== null ? (float) $p->compare_at_price : 0,
+            'claimedPercent'  => $p->claimed_percent,
+            'quantityLeft'    => (int) $p->stock_quantity,
+         ]) 
+
+        ->values()
+        ->all() :  [];
+
+        $dealsMeta = [
+            'badgeText'               => $clearancePromo?->badge_label ?? 'Limited Time',
+            'title'                   => 'Clearance Deals — While Stock Lasts',
+            'subtitle'                => "Prices this low won't be around long. Grab them before the timer runs out.",
+            'countdownDurationSeconds' => $clearancePromo?->ends_at
+                ? max(0, now()->diffInSeconds($clearancePromo->ends_at, false))
+                : 0,
+            'viewAllHref'             => '/shop/products/clearance',
+        ];
+
         return Inertia::render('storefront/home', [
             'shopCategories' => $shopCategories,
             'promoOffers' => $promoOffers,
             'bestSellers' => $bestSellers,
+            'brands' => $brands,
+            'useCases' => $useCases,
+            'deals'     => $deals,
+            'dealsMeta' => $dealsMeta,
         ]);
     }
 

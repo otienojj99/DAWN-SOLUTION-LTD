@@ -8,6 +8,9 @@ use App\Http\Controllers\Api\Storefront\ProductController as StorefrontProductCo
 use App\Http\Controllers\Api\Storefront\UseCaseController as StorefrontUseCaseController;
 use App\Http\Controllers\Api\Storefront\CategoryDealsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Admin\BrandController as AdminBrandController;
+use App\Http\Controllers\Api\Storefront\BrandController as StorefrontBrandController;
+
 
 
 /*
@@ -24,6 +27,15 @@ use Illuminate\Support\Facades\Route;
 //         Route::patch('categories/{category}/move', [AdminCategoryController::class, 'move']);
 //         Route::apiResource('categories', AdminCategoryController::class);
 //     });
+
+Route::middleware(['auth', 'verified'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        // ...existing admin routes
+
+        Route::resource('brands', AdminBrandController::class);
+    });
 
 Route::prefix('admin')
     ->middleware(['auth:sanctum'])
@@ -81,6 +93,10 @@ Route::prefix('storefront')->group(function () {
     Route::get('new-arrivals', CollectionController::class)
     ->defaults('slug', 'new-arrivals')
     ->name('new-arrivals');
+
+
+    Route::get('brands/{slug}', [StorefrontBrandController::class, 'show'])
+    ->name('brands.show');
 
 
 });

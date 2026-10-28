@@ -24,7 +24,7 @@ class Products extends Model
         'weight', 'dimensions',
         'is_active', 'is_featured', 'published_at',
         'meta_title', 'meta_description',
-        'is_best_seller',
+        'is_best_seller', 'initial_stock_quantity',
     ];
 
     protected $casts = [
@@ -44,6 +44,7 @@ class Products extends Model
         'is_featured'       => 'boolean',
         'published_at'      => 'datetime',
         'is_best_seller' => 'boolean',
+        'initial_stock_quantity' => 'integer',
     ];
 
     protected $attributes = [
@@ -251,6 +252,21 @@ class Products extends Model
     }
 
 
+
+    public function  getClaimedPercentAttribute(): int
+    {
+        $initial = (int) ($this->initial_stock_quantity ?? 0);
+        $current = (int) $this->stock_quantity;
+
+
+        if($initial <=0){
+            return 0;
+        }
+
+        $claimed = $initial - $current;
+    }
+
+
     /* ---------- Computed ---------- */
 
     public function getIsInStockAttribute(): bool
@@ -268,7 +284,7 @@ class Products extends Model
      * The single highest-priority live promotion currently applying to this product,
      * accounting for both direct and category-based promotions.
      */
-    public function getActivePromotionAttribute(): ?Promotion
+    public function getActivePromotionAttribute(): ?Promotions
     {
         if ($this->relationLoaded('promotions')) {
             $direct = $this->promotions->where('is_active', true);
