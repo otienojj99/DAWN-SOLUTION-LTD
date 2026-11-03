@@ -10,6 +10,9 @@ use App\Http\Controllers\Api\Storefront\CategoryDealsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Api\Storefront\BrandController as StorefrontBrandController;
+use App\Http\Controllers\Api\Storefront\NewsletterController;
+use App\Http\Controllers\Api\Storefront\QuoteController;
+
 
 
 
@@ -37,6 +40,12 @@ Route::middleware(['auth', 'verified'])
         Route::resource('brands', AdminBrandController::class);
     });
 
+
+Route::post('newsletter/subscribe', [NewsletterController::class, 'store'])
+    ->name('newsletter.subscribe');
+
+    Route::post('quote-requests', [QuoteController::class, 'store'])
+    ->name('quotes.store');
 Route::prefix('admin')
     ->middleware(['auth:sanctum'])
     ->group(function () {

@@ -13,6 +13,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use App\Http\Controllers\Api\Storefront\NewsletterController;
+use App\Http\Controllers\Api\Storefront\QuoteController;
 
 // Home
 Route::get('/', HomeController::class)->name('home');
@@ -26,8 +30,21 @@ Route::middleware(['auth', 'verified'])
         // More admin web routes here as they're built
     });
 
+Route::post('newsletter/subscribe', [NewsletterController::class, 'store'])
+    ->name('newsletter.subscribe');
+
+    Route::post('quote-requests', [QuoteController::class, 'store'])
+    ->name('quotes.store');
+
 // Storefront (Inertia pages — public)
 Route::prefix('shop')->name('shop.')->group(function () {
+    Route::get('/', function (Request $request) {
+        return Inertia::render('storefront/shop', [
+            'initialPath' => [],
+            'initialSearch' => $request->getQueryString() ?? '',
+        ]);
+    })->name('index');
+
     // Categories
     Route::get('categories', [StorefrontCategoryController::class, 'index'])->name('categories.index');
     Route::get('categories/tree', [StorefrontCategoryController::class, 'tree'])->name('categories.tree');
@@ -55,6 +72,19 @@ Route::prefix('shop')->name('shop.')->group(function () {
 
     // Brands
     Route::get('brands/{slug}', [StorefrontBrandController::class, 'show'])->name('brands.show');
+
+
+    
+
+    Route::get('{path?}', function (Request $request) {
+        $path = $request->route('path') ?? '';
+
+        return Inertia::render('storefront/shop', [
+            'initialPath' => $path === '' ? [] : explode('/', $path),
+            'initialSearch' => $request->getQueryString() ?? '',
+        ]);
+    })->where('path', '.*')->name('browse');
+
 });
 
 // Dashboard

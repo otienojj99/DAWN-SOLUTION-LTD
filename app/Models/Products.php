@@ -253,17 +253,18 @@ class Products extends Model
 
 
 
-    public function  getClaimedPercentAttribute(): int
+    public function getClaimedPercentAttribute(): int
     {
         $initial = (int) ($this->initial_stock_quantity ?? 0);
         $current = (int) $this->stock_quantity;
 
-
-        if($initial <=0){
+        if ($initial <= 0) {
             return 0;
         }
 
         $claimed = $initial - $current;
+
+        return (int) min(100, max(0, round(($claimed / $initial) * 100)));
     }
 
 

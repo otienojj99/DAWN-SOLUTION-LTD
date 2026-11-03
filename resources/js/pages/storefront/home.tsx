@@ -16,6 +16,8 @@ import { DealsSection } from '@/components/deals';
 import type { Deal, DealsSectionMeta } from '@/types/deal';
 import { NewsletterQuoteSection} from '@/components/cta/NewsletterQuoteSection';
 import { Footer } from '@/components/Footer';
+import { api } from '@/lib/api';
+import type { QuoteRequest } from '@/types/forms';
 
 // import { brands } from '@/data/brands';
 
@@ -35,7 +37,14 @@ type Props = {
 
 export default function Home({ promoOffers, shopCategories, bestSellers, brands, useCases, deals, dealsMeta }: Props) {
 
-    
+  
+    async function handleSubscribe(email: string): Promise<void> {
+        await api.post('/newsletter/subscribe', { email });
+    }
+
+    async function handleRequestQuote(request: QuoteRequest): Promise<void> {
+        await api.post('/quote-requests', request);
+    }
     return (
         < >
             <Header />
@@ -50,7 +59,7 @@ export default function Home({ promoOffers, shopCategories, bestSellers, brands,
                    useCases={useCases}
                />
                <DealsSection {...dealsMeta} deals={deals} />
-              <NewsletterQuoteSection
+              {/* <NewsletterQuoteSection
                     onSubscribe={async (email) => {
                         await new Promise((resolve) => setTimeout(resolve, 600));
                         console.log('subscribe', email);
@@ -59,7 +68,12 @@ export default function Home({ promoOffers, shopCategories, bestSellers, brands,
                         await new Promise((resolve) => setTimeout(resolve, 600));
                         console.log('quote request', request);
                     }}
-                />
+                /> */}
+
+                <NewsletterQuoteSection
+                onSubscribe={handleSubscribe}
+                    onRequestQuote={handleRequestQuote}
+               />
 
             <Footer />
         </>
