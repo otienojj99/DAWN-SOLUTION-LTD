@@ -8,31 +8,35 @@ export interface ProductBadge {
     color: string;
 }
 
-/**
- * A real, linkable product. This is the shape the hero carousel, product
- * cards, and (eventually) the shop grid all consume — one definition shared
- * everywhere, so "the hero shows real products" stays true as the catalog
- * grows instead of drifting into hero-only placeholder data.
- */
 export interface Product {
     id: string;
-    /** Used to build the product page URL: `/products/${slug}`. */
     slug: string;
     name: string;
     brand: string;
-    /** Top-level category label, used by the best-sellers tabs (e.g. "Laptops"). */
+    /** Optional — only present on shop-page products. */
+    brandSlug?: string;
     category: string;
-    image: string;
+    /** Optional — only present on shop-page products. */
+    categorySlug?: string;
+    /** Optional — only present on shop-page products. */
+    categoryPath?: string;
+    image: string | null;
     price: number;
-    oldPrice?: number;
+    oldPrice?: number | null;
     currency?: string;
     specs: ProductSpec[];
     rating?: number | null;
-    reviewCount?: number;
+    reviewCount?: number | null;
     inStock?: boolean;
-    /** When set and low (<= 5), cards show an urgency "Only N left" message. */
-    stockCount?: number;
-    badge?: ProductBadge;
-    /** Marks the product as a best seller for the BestSellersSection. */
+    stockCount?: number | null;
+    badge?: ProductBadge | null;
     bestSeller?: boolean;
+
+    /* Shop-page filter fields — extracted from specs server-side */
+    ram?: string | null;
+    storage?: string | null;
+    screenSize?: string | null;
+    cpu?: string | null;
+    gpu?: string | null;
+    os?: string | null;
 }

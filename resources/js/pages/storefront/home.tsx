@@ -59,16 +59,7 @@ export default function Home({ promoOffers, shopCategories, bestSellers, brands,
                    useCases={useCases}
                />
                <DealsSection {...dealsMeta} deals={deals} />
-              {/* <NewsletterQuoteSection
-                    onSubscribe={async (email) => {
-                        await new Promise((resolve) => setTimeout(resolve, 600));
-                        console.log('subscribe', email);
-                    }}
-                    onRequestQuote={async (request) => {
-                        await new Promise((resolve) => setTimeout(resolve, 600));
-                        console.log('quote request', request);
-                    }}
-                /> */}
+            
 
                 <NewsletterQuoteSection
                 onSubscribe={handleSubscribe}

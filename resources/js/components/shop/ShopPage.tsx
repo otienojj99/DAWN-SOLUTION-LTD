@@ -1,8 +1,8 @@
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { shopProducts } from '@/data/shop-products';
-import { shopTree } from '@/data/shop-tree';
-import { SHOP_BASE_PATH } from '@/data/shop-config';
+// import { shopTree } from '@/data/shop-tree';
+// import { SHOP_BASE_PATH } from '@/data/shop-config';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useShopState } from '@/hooks/useShopState';
 import { breadcrumbs, buildSidebar, resolveCategory } from '@/lib/shop-category';
@@ -21,9 +21,9 @@ import { SortSelect } from './SortSelect';
 
 interface ShopPageProps {
     /** The catalogue. Replace the demo data with your backend's products (same `ShopProduct` shape). */
-    products?: ShopProduct[];
+    products: ShopProduct[];   
     /** The category tree. Replace with your `categories` table converted to nested nodes. */
-    tree?: CategoryNode[];
+    tree: CategoryNode[]; 
     /** Category path from the URL (['laptops','dell','latitude']). Pass the server's value so SSR and hydration agree. */
     initialPath?: string[];
     /** `location.search` from the request. */
@@ -43,7 +43,7 @@ const SITE_NAME = 'Dawn Solution';
  * from it by the pure functions in lib/shop-*.ts. To move filtering to the
  * server, swap only `computeShopResults` for Inertia props (README).
  */
-export function ShopPage({ products = shopProducts, tree = shopTree, initialPath = [], initialSearch = '', onAddToCart, onToggleWishlist }: ShopPageProps) {
+export function ShopPage({ products, tree, initialPath = [], initialSearch = '', onAddToCart, onToggleWishlist }: ShopPageProps) {
     const { path, query, updateQuery, setPath, clearFilters } = useShopState({ initialPath, initialSearch });
     const [drawerOpen, setDrawerOpen] = useState(false);
     const prefersReducedMotion = usePrefersReducedMotion();
@@ -89,7 +89,7 @@ export function ShopPage({ products = shopProducts, tree = shopTree, initialPath
                 <div className="mx-auto max-w-[1280px] px-4 py-16 text-center sm:px-6">
                     <h1 className="mb-2 text-2xl font-extrabold text-[#152B4D]">{heading}</h1>
                     <p className="mb-6 text-[14px] text-[#5B6470]">That category doesn't exist or has moved.</p>
-                    <a href={SHOP_BASE_PATH} onClick={(e) => { e.preventDefault(); goToCategory([]); }} className="inline-block rounded-lg bg-[#325A96] px-5 py-2.5 text-[14px] font-bold text-white hover:bg-[#152B4D]">
+                    <a href={SITE_BASE_PATH} onClick={(e) => { e.preventDefault(); goToCategory([]); }} className="inline-block rounded-lg bg-[#325A96] px-5 py-2.5 text-[14px] font-bold text-white hover:bg-[#152B4D]">
                         Browse all products
                     </a>
                 </div>

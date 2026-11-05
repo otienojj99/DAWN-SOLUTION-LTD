@@ -19,7 +19,7 @@ export interface CategoryNode {
 }
 
 /** A product in the shop catalogue: a normal `Product` plus where it lives and what can be filtered on. */
-export interface ShopProduct extends Product {
+export interface ShopProduct extends Omit<Product, 'categoryPath'> {
     /** Category slugs from the root down, e.g. ['laptops', 'dell', 'latitude']. */
     categoryPath: string[];
     /** Filterable specs keyed by `FacetAttribute.key` (e.g. { ram: '16GB' }). */
