@@ -15,6 +15,7 @@ interface CategorySidebarProps {
  * categories, dropdowns for two-level ones. This component only draws it.
  */
 export function CategorySidebar({ sections, onNavigate }: CategorySidebarProps) {
+     if (!sections.length) return null;  
     return (
         <nav aria-label="Categories" className="grid gap-1">
             {sections.map((section) => (

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use \App\Models\Brands;
 
 class Products extends Model
 {
@@ -79,7 +80,7 @@ class Products extends Model
 
      public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brands::class);
+        return $this->belongsTo(Brands::class, 'brand_id');
     }
 
     public function images(): HasMany
@@ -94,19 +95,19 @@ class Products extends Model
 
     public function variants(): HasMany
     {
-        return $this->hasMany(ProductVariants::class)->ordered();
+        return $this->hasMany(ProductVariants::class, 'product_id')->ordered();
     }
 
     public function defaultVariant(): HasMany
     {
-        return $this->hasMany(ProductVariants::class)->where('is_default', true);
+        return $this->hasMany(ProductVariants::class, 'product_id')->where('is_default', true);
     }
 
     public function attributeValues(): BelongsToMany
     {
         return $this->belongsToMany(
             AttributeValues::class,
-            'product_attribute_value',
+            'product_attribute_values',
             'product_id',
             'attribute_value_id'
         );

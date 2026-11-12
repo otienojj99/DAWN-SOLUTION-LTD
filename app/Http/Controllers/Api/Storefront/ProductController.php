@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Api\Storefront;
 use App\Enums\ApiErrorCode;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\Products;
 use App\Services\Product\Filters\ProductFilters;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
+
 
 class ProductController extends StorefrontApiController
 {
@@ -34,10 +38,38 @@ class ProductController extends StorefrontApiController
 
     /* ---------- SHOW ---------- */
 
-    public function show(string $slug): JsonResponse
+    public function show(string $slug): InertiaResponse
+    {
+        $product = $this->findVisibleProduct($slug);
+
+        $related = Products::query()
+            ->visible()
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with(['brand', 'category', 'images', 'promotions'])
+            ->limit(4)
+            ->get();
+
+       return Inertia::render('storefront/product/product', [
+        'product' => (new ProductResource($product))->forStorefront()->resolve(),
+        'related' => ProductResource::collection($related)
+            ->map(fn ($r) => $r->forStorefront()->resolve())
+            ->all(),
+       ]);
+    }
+
+    public function showApi(string $slug): JsonResponse
+    {
+        return $this->respondSuccess(
+            (new ProductResource($this->findVisibleProduct($slug)))->forStorefront(),
+            'Product fetched successfully'
+        );
+    }
+
+    protected function findVisibleProduct(string $slug): Products
     {
         $product = $this->service->findBySlug($slug, [
-            'brands', 'category',
+            'brand', 'category',
             'images', 'variants.attributeValues.attribute',
             'attributeValues.attribute',
             'useCases', 'promotions',
@@ -48,10 +80,7 @@ class ProductController extends StorefrontApiController
             $this->fail(ApiErrorCode::PRODUCT_NOT_FOUND, 'Product not found.');
         }
 
-        return $this->respondSuccess(
-            (new ProductResource($product))->forStorefront(),
-            'Product fetched successfully'
-        );
+        return $product;
     }
 
     /* ---------- CONVENIENCE ENDPOINTS ---------- */

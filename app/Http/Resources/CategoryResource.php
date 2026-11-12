@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -87,10 +88,11 @@ class CategoryResource extends JsonResource{
         'created_at'    => $this->created_at?->toIso8601String(),
         'updated_at'    => $this->updated_at?->toIso8601String(),
     ];
+}
 
-    protected function detailPayload(): array
-    {
-        return array_merge($this->defaultPayload(), [
+        protected function detailPayload(): array
+        {
+            return array_merge($this->adminPayload(), [
             'parent' => new self($this->whenLoaded('parent')),
 
             'children' => self::collection(

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FocusEvent } from 'react';
 import { heroSlides } from '@/data/hero-slides';
-import { getProductById } from '@/data/products';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import type { Product } from '@/types/product';
 import { HeroSlide } from './HeroSlide';
 import { CarouselArrows } from './CarouselArrows';
 import { CarouselDots } from './CarouselDots';
@@ -9,6 +9,7 @@ import { CarouselDots } from './CarouselDots';
 const AUTOPLAY_MS = 6000;
 
 interface HeroSectionProps {
+    products: Product[];
     slides?: typeof heroSlides;
 }
 
@@ -20,22 +21,23 @@ interface HeroSectionProps {
  *  - resets its timer whenever the person navigates manually (arrow/dot),
  *    so a manual click doesn't get immediately overridden by the next tick
  */
-export function HeroSection({ slides = heroSlides }: HeroSectionProps) {
+export function HeroSection({ products, slides = heroSlides }: HeroSectionProps) {
+    const featuredSlides = slides.slice(0, products.length);
     const [activeIndex, setActiveIndex] = useState(0);
     const [paused, setPaused] = useState(false);
     const resetSignalRef = useRef(0);
     const [resetSignal, setResetSignal] = useState(0);
     const prefersReducedMotion = usePrefersReducedMotion();
-    const shouldAutoplay = !paused && !prefersReducedMotion && slides.length > 1;
+    const shouldAutoplay = !paused && !prefersReducedMotion && featuredSlides.length > 1;
 
     useEffect(() => {
         if (!shouldAutoplay) return;
         const id = setInterval(() => {
-            setActiveIndex((i) => (i + 1) % slides.length);
+            setActiveIndex((i) => (i + 1) % featuredSlides.length);
         }, AUTOPLAY_MS);
         return () => clearInterval(id);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [shouldAutoplay, resetSignal, slides.length]);
+    }, [shouldAutoplay, resetSignal, featuredSlides.length]);
 
     function goTo(index: number) {
         setActiveIndex(index);
@@ -44,11 +46,11 @@ export function HeroSection({ slides = heroSlides }: HeroSectionProps) {
     }
 
     function next() {
-        goTo((activeIndex + 1) % slides.length);
+        goTo((activeIndex + 1) % featuredSlides.length);
     }
 
     function prev() {
-        goTo((activeIndex - 1 + slides.length) % slides.length);
+        goTo((activeIndex - 1 + featuredSlides.length) % featuredSlides.length);
     }
 
     function handleBlur(event: FocusEvent<HTMLDivElement>) {
@@ -58,6 +60,8 @@ export function HeroSection({ slides = heroSlides }: HeroSectionProps) {
             setPaused(false);
         }
     }
+
+    if (featuredSlides.length === 0) return null;
 
     return (
         <section
@@ -85,12 +89,12 @@ export function HeroSection({ slides = heroSlides }: HeroSectionProps) {
             />
 
             <div className="relative h-full w-full">
-                {slides.map((slide, index) => (
-                    <HeroSlide key={slide.id} slide={slide} product={getProductById(slide.productId)} active={index === activeIndex} />
+                {featuredSlides.map((slide, index) => (
+                    <HeroSlide key={slide.id} slide={slide} product={products[index]} active={index === activeIndex} />
                 ))}
             </div>
 
-            {slides.length > 1 && (
+            {featuredSlides.length > 1 && (
                 <>
                     <CarouselArrows onPrev={prev} onNext={next} />
                     <CarouselDots

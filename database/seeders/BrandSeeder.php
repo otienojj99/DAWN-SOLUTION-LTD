@@ -14,7 +14,7 @@ class BrandSeeder extends Seeder
             'Lenovo', 'Dell', 'HP', 'Asus', 'Apple', 'Acer', 'MSI', 'Samsung',
             'Logitech', 'Jabra', 'JBL', 'Soundcore', 'UGREEN', 'Corsair', 'EVGA',
             'Seasonic', 'Intel', 'AMD', 'NVIDIA', 'Canon', 'Epson', 'Brother',
-            'Synology', 'QNAP', 'Cisco', 'TP-Link', 'Ubiquiti', 'Fortinet',
+            'Synology', 'QNAP', 'Cisco', 'TP-Link', 'Ubiquiti', 'Fortinet', 'Targus',
         ];
 
         foreach ($brands as $i => $name) {

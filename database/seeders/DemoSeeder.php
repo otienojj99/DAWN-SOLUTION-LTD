@@ -326,7 +326,7 @@ class DemoSeeder extends Seeder
         $bagsCat   = Category::where('slug', 'bags-cases')->value('id');
 
         $logitech = Brands::where('slug', 'logitech')->value('id');
-        $targus   = Brands::where('slug', 'targus')->value('id');
+        $targus   = Brands::where('slug', 'targus')->firstOrFail()->id;
         $ugreen   = Brands::where('slug', 'ugreen')->value('id');
 
         $lifestyle = UseCase::where('slug', 'lifestyle')->value('id');

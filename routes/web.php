@@ -13,8 +13,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;  
-use Inertia\Inertia;
 use App\Http\Controllers\Api\Storefront\NewsletterController;
 use App\Http\Controllers\Api\Storefront\QuoteController;
 use App\Http\Controllers\Api\Storefront\ShopController;
@@ -38,18 +36,16 @@ Route::post('newsletter/subscribe', [NewsletterController::class, 'store'])
 
 // Storefront (Inertia pages — public)
 Route::prefix('shop')->name('shop.')->group(function () {
+
+    // 1. Shop index (must be first — most specific)
     Route::get('/', [ShopController::class, 'index'])->name('index');
 
-    // Categories
+    // 2. All SPECIFIC routes BEFORE the catch-all
     Route::get('categories', [StorefrontCategoryController::class, 'index'])->name('categories.index');
     Route::get('categories/tree', [StorefrontCategoryController::class, 'tree'])->name('categories.tree');
     Route::get('categories/{categorySlug}/deals/{promotionSlug}', CategoryDealsController::class)->name('categories.deals');
     Route::get('categories/{category}', [StorefrontCategoryController::class, 'show'])->name('categories.show');
 
-    // Products — static routes first
-    Route::get('{path?}', [ShopController::class, 'browse'])
-        ->where('path', '.*')
-        ->name('browse');
     Route::get('products', [StorefrontProductController::class, 'index'])->name('products.index');
     Route::get('products/discounts', [StorefrontProductController::class, 'onDiscount'])->name('products.discounts');
     Route::get('products/clearance', [StorefrontProductController::class, 'onClearance'])->name('products.clearance');
@@ -57,10 +53,8 @@ Route::prefix('shop')->name('shop.')->group(function () {
     Route::get('products/new-arrivals', [StorefrontProductController::class, 'newArrivals'])->name('products.new-arrivals');
     Route::get('products/{product:slug}', [StorefrontProductController::class, 'show'])->name('products.show');
 
-    // Use cases
     Route::get('shop-by/{slug}', [StorefrontUseCaseController::class, 'show'])->name('use-cases.show');
 
-    // Collections
     Route::get('deals/{slug}', CollectionController::class)
         ->whereIn('slug', CollectionRegistry::slugs())
         ->name('deals.show');
@@ -68,21 +62,12 @@ Route::prefix('shop')->name('shop.')->group(function () {
         ->defaults('slug', 'new-arrivals')
         ->name('new-arrivals');
 
-    // Brands
     Route::get('brands/{slug}', [StorefrontBrandController::class, 'show'])->name('brands.show');
 
-
-    
-
-    Route::get('{path?}', function (Request $request) {
-        $path = $request->route('path') ?? '';
-
-        return Inertia::render('storefront/shop', [
-            'initialPath' => $path === '' ? [] : explode('/', $path),
-            'initialSearch' => $request->getQueryString() ?? '',
-        ]);
-    })->where('path', '.*')->name('browse');
-
+    // 3. Catch-all LAST — anything not matched above goes to the shop drill-down
+    Route::get('{path?}', [ShopController::class, 'browse'])
+        ->where('path', '.*')
+        ->name('browse');
 });
 
 // Dashboard

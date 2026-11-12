@@ -1,3 +1,5 @@
+import { show as showShopProduct } from '@/routes/shop/products';
+
 export function productHref(product: { slug: string }): string {
-    return `/shop/products/${product.slug}`;
+    return showShopProduct.url({ product: product.slug });
 }

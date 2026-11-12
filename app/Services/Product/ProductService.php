@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 
 
-class ProductServices {
+class ProductService {
      /* =========================================================
      |  LIST / FIND
      ========================================================= */
@@ -589,4 +589,3 @@ class ProductServices {
 }
 
  
-

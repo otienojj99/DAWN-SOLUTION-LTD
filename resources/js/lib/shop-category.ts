@@ -115,62 +115,130 @@ function link(node: CategoryNode, path: string[], current: string[], products: S
  *  - On the all-products page every root is a dropdown (three-level roots
  *    contain their series grouped by brand).
  */
-export function buildSidebar(tree: CategoryNode[], currentPath: string[], products: ShopProduct[]): SidebarSection[] {
-    const root = tree.find((n) => n.slug === currentPath[0]);
+// export function buildSidebar(tree: CategoryNode[], currentPath: string[], products: ShopProduct[]): SidebarSection[] {
+//     const root = tree.find((n) => n.slug === currentPath[0]);
 
-    // Inside a three-level root: series only.
-    if (root && isDeepRoot(root)) {
-        const brand = root.children?.find((c) => c.slug === currentPath[1]);
+//     // Inside a three-level root: series only.
+//     if (root && isDeepRoot(root)) {
+//         const brand = root.children?.find((c) => c.slug === currentPath[1]);
 
-        if (brand?.children) {
-            return [
-                {
-                    id: `${root.slug}-${brand.slug}`,
-                    title: `${brand.short ?? brand.label} series`,
-                    collapsible: false,
-                    open: true,
-                    viewAll: link(brand, [root.slug, brand.slug], currentPath, products, `All ${brand.label}`),
-                    groups: [{ links: brand.children.map((s) => link(s, [root.slug, brand.slug, s.slug], currentPath, products)) }],
-                },
-            ];
-        }
+//         if (brand?.children) {
+//             return [
+//                 {
+//                     id: `${root.slug}-${brand.slug}`,
+//                     title: `${brand.short ?? brand.label} series`,
+//                     collapsible: false,
+//                     open: true,
+//                     viewAll: link(brand, [root.slug, brand.slug], currentPath, products, `All ${brand.label}`),
+//                     groups: [{ links: brand.children.map((s) => link(s, [root.slug, brand.slug, s.slug], currentPath, products)) }],
+//                 },
+//             ];
+//         }
 
+//         return [
+//             {
+//                 id: `${root.slug}-series`,
+//                 title: `${root.label} series`,
+//                 collapsible: false,
+//                 open: true,
+//                 viewAll: link(root, [root.slug], currentPath, products, `All ${root.label}`),
+//                 groups: (root.children ?? [])
+//                     .filter((b) => b.children?.length)
+//                     .map((b) => ({
+//                         heading: b.short ?? b.label,
+//                         links: b.children!.map((s) => link(s, [root.slug, b.slug, s.slug], currentPath, products)),
+//                     })),
+//             },
+//         ];
+//     }
+
+//     // Everywhere else: one dropdown per root (the active one open).
+//     return tree
+//         .filter((n) => n.children?.length)
+//         .map((node) => {
+//             const deep = isDeepRoot(node);
+//             return {
+//                 id: node.slug,
+//                 title: node.label,
+//                 collapsible: true,
+//                 open: node.slug === currentPath[0],
+//                 viewAll: link(node, [node.slug], currentPath, products, `All ${node.label}`),
+//                 groups: deep
+//                     ? node.children!
+//                           .filter((b) => b.children?.length)
+//                           .map((b) => ({
+//                               heading: b.short ?? b.label,
+//                               links: b.children!.map((s) => link(s, [node.slug, b.slug, s.slug], currentPath, products)),
+//                           }))
+//                     : [{ links: node.children!.map((c) => link(c, [node.slug, c.slug], currentPath, products)) }],
+//             };
+//         });
+// }
+
+/**
+ * Contextual drill-down sidebar.
+ *
+ * Shows ONLY the direct children of the category you are currently in:
+ *   /shop                                          → top-level categories
+ *   /shop/laptops                                  → its children (brands)
+ *   /shop/laptops/lenovo-laptops                   → its children (series)
+ *   /shop/laptops/lenovo-laptops/lenovo-ideapads   → nothing (leaf)
+ *
+ * Upward navigation is the breadcrumb's job.
+ */
+export function buildSidebar(
+    tree: CategoryNode[],
+    currentPath: string[],
+    products: ShopProduct[],
+): SidebarSection[] {
+    // Walk the tree following currentPath, stopping at the deepest matching node.
+    const trail: CategoryNode[] = [];
+    let level: CategoryNode[] | undefined = tree;
+    for (const slug of currentPath) {
+        const node: CategoryNode | undefined = level?.find((n) => n.slug === slug);
+        if (!node) break;
+        trail.push(node);
+        level = node.children;
+    }
+
+    const currentNode = trail.length > 0 ? trail[trail.length - 1] : null;
+
+    // Root — show top-level categories.
+    if (!currentNode) {
         return [
             {
-                id: `${root.slug}-series`,
-                title: `${root.label} series`,
+                id: 'root',
+                title: 'Categories',
                 collapsible: false,
                 open: true,
-                viewAll: link(root, [root.slug], currentPath, products, `All ${root.label}`),
-                groups: (root.children ?? [])
-                    .filter((b) => b.children?.length)
-                    .map((b) => ({
-                        heading: b.short ?? b.label,
-                        links: b.children!.map((s) => link(s, [root.slug, b.slug, s.slug], currentPath, products)),
-                    })),
+                groups: [
+                    {
+                        links: tree.map((node) => link(node, [node.slug], currentPath, products)),
+                    },
+                ],
             },
         ];
     }
 
-    // Everywhere else: one dropdown per root (the active one open).
-    return tree
-        .filter((n) => n.children?.length)
-        .map((node) => {
-            const deep = isDeepRoot(node);
-            return {
-                id: node.slug,
-                title: node.label,
-                collapsible: true,
-                open: node.slug === currentPath[0],
-                viewAll: link(node, [node.slug], currentPath, products, `All ${node.label}`),
-                groups: deep
-                    ? node.children!
-                          .filter((b) => b.children?.length)
-                          .map((b) => ({
-                              heading: b.short ?? b.label,
-                              links: b.children!.map((s) => link(s, [node.slug, b.slug, s.slug], currentPath, products)),
-                          }))
-                    : [{ links: node.children!.map((c) => link(c, [node.slug, c.slug], currentPath, products)) }],
-            };
-        });
+    // Leaf — nothing to drill into. The filters panel takes over.
+    if (!currentNode.children?.length) {
+        return [];
+    }
+
+    // Interior — show children only.
+    return [
+        {
+            id: `section-${currentNode.slug}`,
+            title: currentNode.label,
+            collapsible: false,
+            open: true,
+            groups: [
+                {
+                    links: currentNode.children.map((child) =>
+                        link(child, [...currentPath, child.slug], currentPath, products),
+                    ),
+                },
+            ],
+        },
+    ];
 }

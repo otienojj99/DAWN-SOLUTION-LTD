@@ -4,15 +4,14 @@ interface CategoryMenuProps {
     columns: CategoryColumn[];
 }
 
-
-export function CategoryMenu( {columns}: CategoryMenuProps){
-     return (
+export function CategoryMenu({ columns }: CategoryMenuProps) {
+    return (
         <div
             role="menu"
-            className="absolute left-0 top-full z-50 flex min-w-[640px] gap-9 rounded-b-lg border-t-[3px] border-[#FAB40A] bg-white px-9 py-7 shadow-[0_16px_32px_rgba(30,58,102,0.18)]"
+            className="absolute left-0 top-full z-50 grid max-h-[70vh] w-[1000px] max-w-[calc(100vw-2rem)] grid-cols-3 gap-x-10 gap-y-7 overflow-y-auto rounded-b-lg border-t-[3px] border-[#FAB40A] bg-white px-9 py-7 shadow-[0_16px_32px_rgba(30,58,102,0.18)]"
         >
             {columns.map((column) => (
-                <div key={column.heading} className="min-w-[150px]">
+                <div key={column.heading} className="min-w-0">
                     <h3 className="mb-3 border-b-2 border-[#E4E7EC] pb-2 text-[13px] font-bold uppercase tracking-wide text-[#325A96]">
                         {column.heading}
                     </h3>

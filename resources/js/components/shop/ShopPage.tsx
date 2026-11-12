@@ -110,7 +110,12 @@ export function ShopPage({ products, tree, initialPath = [], initialSearch = '',
 
                 <div className="lg:grid lg:grid-cols-[272px_minmax(0,1fr)] lg:items-start lg:gap-7">
                     <FilterDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} applyLabel={`Show ${page.total} product${page.total === 1 ? '' : 's'}`}>
-                        <CategorySidebar sections={sidebar} onNavigate={goToCategory} />
+                        {/* <CategorySidebar sections={sidebar} onNavigate={goToCategory} /> */}
+                        {sidebar.length > 0 && (
+                            <div className="mb-5 border-b border-[#E4E7EC] pb-4">
+                                <CategorySidebar sections={sidebar} onNavigate={goToCategory} />
+                            </div>
+                        )}
 
                         <div className="mt-5 border-t border-[#E4E7EC] pt-4">
                             <div className="mb-1 flex items-center justify-between px-1">

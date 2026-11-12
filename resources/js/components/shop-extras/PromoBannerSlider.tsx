@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { FocusEvent, TouchEvent } from 'react';
 import { CarouselArrows } from '@/components/hero/CarouselArrows';
 import { CarouselDots } from '@/components/hero/CarouselDots';
-import { shopBanners } from '@/data/shop-banners';
+import { resolveBannerGradient } from '@/lib/banner-gradients';
+import { resolveBannerIcon } from '@/lib/banner-icons';
+// import { shopBanners } from '@/data/shop-banners';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import type { ShopBanner } from '@/types/banner';
 
@@ -11,7 +13,7 @@ const AUTOPLAY_MS = 7000;
 const SWIPE_PX = 50;
 
 interface PromoBannerSliderProps {
-    banners?: ShopBanner[];
+    banners: ShopBanner[];
 }
 
 /**
@@ -22,7 +24,7 @@ interface PromoBannerSliderProps {
  * motion, and a visible Pause button lets anyone stop it for good.
  * Slides that are off-screen are hidden from assistive tech and from Tab.
  */
-export function PromoBannerSlider({ banners = shopBanners }: PromoBannerSliderProps) {
+export function PromoBannerSlider({ banners }: PromoBannerSliderProps) {
     const [index, setIndex] = useState(0);
     const [hovering, setHovering] = useState(false);
     const [focusWithin, setFocusWithin] = useState(false);
@@ -69,7 +71,7 @@ export function PromoBannerSlider({ banners = shopBanners }: PromoBannerSliderPr
             onBlur={handleBlur}
             onTouchStart={(e) => (touchStartX.current = e.touches[0].clientX)}
             onTouchEnd={handleTouchEnd}
-            className="relative isolate overflow-hidden rounded-2xl shadow-[0_10px_30px_rgba(21,43,77,0.15)]"
+            className="relative isolate overflow-hidden rounded-2xl shadow-[0_10px_30px_rgba(21,43,77,0.15)] m-6 lg:my-14 "
         >
             <div
                 className="flex transition-transform duration-700 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none"
@@ -102,7 +104,8 @@ export function PromoBannerSlider({ banners = shopBanners }: PromoBannerSliderPr
 }
 
 function Slide({ banner, active, position, total }: { banner: ShopBanner; active: boolean; position: number; total: number }) {
-    const Icon = banner.icon;
+    const Icon = resolveBannerIcon(banner.icon);
+    const gradient = resolveBannerGradient(banner.gradientKey);
 
     return (
         <div
@@ -110,15 +113,17 @@ function Slide({ banner, active, position, total }: { banner: ShopBanner; active
             aria-roledescription="slide"
             aria-label={`${position} of ${total}: ${banner.title}`}
             aria-hidden={!active}
-            className={`relative flex min-h-[340px] w-full shrink-0 items-center bg-gradient-to-br md:min-h-[320px] ${banner.gradient}`}
+            className={`relative flex min-h-[340px] w-full shrink-0 items-center bg-gradient-to-br md:min-h-[320px] ${gradient}`}
         >
             {/* Photo: a faint backdrop on phones, a masked right-hand panel from md up. */}
-            <img
-                src={banner.image}
-                alt={banner.imageAlt}
-                loading="lazy"
-                className="absolute inset-y-0 right-0 h-full w-full object-cover opacity-20 md:w-[55%] md:opacity-100 [-webkit-mask-image:linear-gradient(to_right,transparent,black_45%)] [mask-image:linear-gradient(to_right,transparent,black_45%)]"
-            />
+            {banner.image ? (
+                <img
+                    src={banner.image}
+                    alt={banner.imageAlt ?? banner.title}
+                    loading="lazy"
+                    className="absolute inset-y-0 right-0 h-full w-full object-cover opacity-20 md:w-[55%] md:opacity-100 [-webkit-mask-image:linear-gradient(to_right,transparent,black_45%)] [mask-image:linear-gradient(to_right,transparent,black_45%)]"
+                />
+            ) : null}
             <div className="pointer-events-none absolute -left-16 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
 
             <div className="relative z-10 max-w-[560px] px-6 pb-14 pt-8 sm:px-10 md:px-20 md:pb-10">

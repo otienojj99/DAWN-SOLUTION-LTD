@@ -88,7 +88,7 @@ Route::prefix('storefront')->group(function () {
     Route::get('products/new-arrivals', [StorefrontProductController::class, 'newArrivals']);
 
     Route::get('products', [StorefrontProductController::class, 'index']);
-    Route::get('products/{product:slug}', [StorefrontProductController::class, 'show']);
+    Route::get('products/{product:slug}', [StorefrontProductController::class, 'showApi']);
     
 
     // Use Cases
@@ -109,5 +109,4 @@ Route::prefix('storefront')->group(function () {
 
 
 });
-
 

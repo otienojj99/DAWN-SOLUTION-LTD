@@ -34,45 +34,47 @@ class ProductResource extends JsonResource
 
     protected function storefrontPayload(): array
     {
-        return [
-            'id'                => $this->id,
-            'name'              => $this->name,
-            'slug'              => $this->slug,
-            'type'              => $this->type,
-            'short_description' => $this->short_description,
-            'long_description'  => $this->when($request = request()->routeIs('*.show'), $this->long_description),
+         return [
+        'id'                => $this->id,
+        'name'              => $this->name,
+        'slug'              => $this->slug,
+        'sku'               => $this->sku,                       // ← add
+        'type'              => $this->type,
+        'short_description' => $this->short_description,
+        'long_description'  => $this->when(
+            request()->routeIs('shop.products.show'),
+            $this->long_description,
+        ),
 
-            'category'          => new CategoryResource($this->whenLoaded('category')),
-            'brand'             => new BrandResource($this->whenLoaded('brand')),
+        // Stock & best-seller flags (needed by the product page)
+        'stock_quantity'    => $this->stock_quantity,            // ← add
+        'is_best_seller'    => (bool) $this->is_best_seller,     // ← add
 
-            'price' => [
-                'base_kes'       => (float) $this->price,
-                'effective_kes'  => (float) $this->effective_price,
-                'compare_at_kes' => $this->compare_at_price !== null ? (float) $this->compare_at_price : null,
-                'base_usd'       => $this->price_usd !== null ? (float) $this->price_usd : null,
-                'effective_usd'  => $this->effective_price_usd,
-                'currency'       => 'KES',
-            ],
+        // Specs for the product detail table
+        'specifications'    => $this->specifications,            // ← add
 
-            'promotions' => PromotionResource::collection($this->whenLoaded('promotions'))
-            ->collection
-            ->map(fn ($p) => (new PromotionResource($p))->forStorefront()),
+        'category' => new CategoryResource($this->whenLoaded('category')),
+        'brand'    => new BrandResource($this->whenLoaded('brand')),
 
-            'badge'            => $this->badge,
-            'discount_percent' => $this->discount_percent,
-            'is_in_stock'      => $this->is_in_stock,
-            'in_stock'         => $this->is_in_stock,
+        'price' => [
+            'base_kes'       => (float) $this->price,
+            'effective_kes'  => (float) $this->effective_price,
+            'compare_at_kes' => $this->compare_at_price !== null ? (float) $this->compare_at_price : null,
+            'base_usd'       => $this->price_usd !== null ? (float) $this->price_usd : null,
+            'effective_usd'  => $this->effective_price_usd,
+            'currency'       => 'KES',
+        ],
 
-            'images' => ProductImageResource::collection($this->whenLoaded('images')),
+        'badge'            => $this->badge,
+        'discount_percent' => $this->discount_percent,
+        'is_in_stock'      => $this->is_in_stock,
+        'in_stock'         => $this->is_in_stock,
 
-            'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
-
-            'attribute_values' => AttributeValueResource::collection(
-                $this->whenLoaded('attributeValues')
-            ),
-
-            'use_cases' => UseCaseResource::collection($this->whenLoaded('useCases')),
-        ];
+        'images'           => ProductImageResource::collection($this->whenLoaded('images')),
+        'variants'         => ProductVariantResource::collection($this->whenLoaded('variants')),
+        'attribute_values' => AttributeValueResource::collection($this->whenLoaded('attributeValues')),
+        'use_cases'        => UseCaseResource::collection($this->whenLoaded('useCases')),
+    ];
     }
 
     /* =========================================================

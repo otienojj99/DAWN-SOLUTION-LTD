@@ -1,7 +1,7 @@
 import { ArrowRight, Eye } from 'lucide-react';
 import type { HeroSlide as HeroSlideData } from '@/types/hero';
 import type { Product } from '@/types/product';
-import { productHref } from '@/data/products';
+import { productHref } from '@/lib/routes';
 
 interface HeroSlideProps {
     slide: HeroSlideData;
@@ -82,11 +82,13 @@ export function HeroSlide({ slide, product, active }: HeroSlideProps) {
             {/* ===== Image column ===== */}
             <div className="relative ml-auto hidden h-full flex-1 items-center justify-center md:flex">
                 <a href={href} aria-label={`View ${product.name}`} className="group relative block">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="max-h-[420px] w-full max-w-[560px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-                    />
+                    {product.image && (
+                        <img
+                            src={product.image}
+                            alt={product.name}
+                            className="max-h-[420px] w-full max-w-[560px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                        />
+                    )}
 
                     {/* Hover reveal — visual affordance that the image itself is clickable */}
                     <span className="absolute inset-0 flex items-center justify-center rounded-2xl bg-[#152B4D]/0 opacity-0 transition-all duration-200 group-hover:bg-[#152B4D]/10 group-hover:opacity-100">

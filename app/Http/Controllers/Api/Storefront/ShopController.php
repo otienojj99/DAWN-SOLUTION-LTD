@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Products;
+use App\Models\ShopBanner;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -42,9 +43,31 @@ class ShopController extends Controller
             ])])
             ->get();
 
+        $banners = ShopBanner::query()
+            ->active()
+            ->ordered()
+            ->get()
+            ->map(fn (ShopBanner $b) => [
+                    'id'          => (string) $b->id,
+                    'kind'        => $b->kind,
+                    'tag'         => $b->tag,
+                    'icon'        => $b->icon,
+                    'title'       => $b->title,
+                    'description' => $b->description,
+                    'highlight'   => $b->highlight,
+                    'ctaLabel'    => $b->cta_label,
+                    'href'        => $b->href,
+                    'image'       => $b->image_url,
+                    'imageAlt'    => $b->image_alt,
+                    'gradientKey' => $b->gradient_key,
+            ])
+             ->values()
+             ->all();
+
         return Inertia::render('storefront/shop', [
             'products'      => $products->map(fn (Products $p) => $this->mapProduct($p))->values()->all(),
             'tree'          => $this->mapTree($tree),
+            'banners'       => $banners,
             'initialPath'   => $initialPath,
             'initialSearch' => $request->getQueryString() ?? '',
         ]);

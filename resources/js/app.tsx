@@ -16,6 +16,7 @@ void createInertiaApp({
             case name === 'storefront/home':
                 return null;
             case name === 'storefront/shop':
+            case name === 'storefront/product/product':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
