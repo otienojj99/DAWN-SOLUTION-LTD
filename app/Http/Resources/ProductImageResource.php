@@ -12,11 +12,29 @@ class ProductImageResource extends JsonResource
         return [
             'id'         => $this->id,
             'path'       => $this->path,
-            'url'        => $this->path ? asset('storage/' . ltrim($this->path, '/')) : null,
+             'url'        => $this->resolveUrl(),
             'alt_text'   => $this->alt_text,
             'is_primary' => (bool) $this->is_primary,
             'sort_order' => $this->sort_order,
             'variant_id' => $this->variant_id,
         ];
+    }
+
+    protected function resolveUrl(): ?string
+    {
+        if (! $this->path) {
+            return null;
+        }
+
+        // External URL — return as-is
+        if (str_starts_with($this->path, 'http://') || str_starts_with($this->path, 'https://')) {
+            return $this->path;
+        }
+
+         $diskPath = storage_path('app/public/' . ltrim($this->path, '/'));
+
+          return file_exists($diskPath)
+            ? asset('storage/' . ltrim($this->path, '/'))
+            : null;
     }
 }

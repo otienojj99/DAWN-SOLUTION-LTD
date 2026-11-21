@@ -39,9 +39,9 @@ export function MainHeader({
                 </div>
 
                 <div className="ml-auto flex items-center md:ml-0 md:gap-1">
-                    <WishlistButton count={wishlistCount} />
-                    <CartButton count={cartCount} />
-                    <AccountMenu userName={userName} />
+                    <WishlistButton />
+                    <CartButton />
+                    <AccountMenu />
                 </div>
             </div>
 

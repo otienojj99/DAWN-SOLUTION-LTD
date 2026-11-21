@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
+use App\Models\Products;
 use App\Models\UseCase;
 use App\Services\Product\Filters\ProductFilters;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class UseCaseController extends Controller
             'is_active' => true,
         ]);
 
-        $products = Product::query()
+        $products = Products::query()
             ->visible()
             ->whereHas('useCases', fn ($q) => $q->where('use_cases.id', $useCase->id))
             ->with(['primaryImage', 'brand', 'category'])

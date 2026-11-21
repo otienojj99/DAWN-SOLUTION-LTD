@@ -49,7 +49,7 @@ class ProductFilters
         }
     }
 
-    protected function applyReletionship(Bulder $q){
+    protected function applyRelations(Builder $q){
          if ($this->filled('category_id')) {
             $q->where('category_id', (int) $this->filters['category_id']);
          }
@@ -81,7 +81,7 @@ class ProductFilters
     }
 
 
-    protected function applyFlags(Builder q): void
+    protected function applyFlags(Builder $q): void
     {
         if($this->has('is_active')){
             $q->where('is_active', filter_var($this->filters['is_active'], FILTER_VALIDATE_BOOLEAN));

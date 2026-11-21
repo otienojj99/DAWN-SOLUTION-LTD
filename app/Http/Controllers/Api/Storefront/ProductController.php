@@ -74,6 +74,7 @@ class ProductController extends StorefrontApiController
             'attributeValues.attribute',
             'useCases', 'promotions',
             'bundleItems.component.primaryImage',
+            'approvedReviews' => fn ($q) => $q->latest(),
         ]);
 
         if (! $product->is_active || $product->published_at === null || $product->published_at->isFuture()) {

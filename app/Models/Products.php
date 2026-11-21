@@ -159,6 +159,16 @@ class Products extends Model
         return $this->hasMany(BundleItems::class, 'component_product_id');
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'product_id');
+    }
+
+    public function approvedReviews(): HasMany
+    {
+        return $this->hasMany(Review::class, 'product_id')->where('is_approved', true);
+    }
+
      /* ---------- Scopes ---------- */
 
      public function scopeActive(Builder $q): Builder

@@ -74,6 +74,16 @@ class ProductResource extends JsonResource
         'variants'         => ProductVariantResource::collection($this->whenLoaded('variants')),
         'attribute_values' => AttributeValueResource::collection($this->whenLoaded('attributeValues')),
         'use_cases'        => UseCaseResource::collection($this->whenLoaded('useCases')),
+        'reviews'          => ReviewResource::collection($this->whenLoaded('approvedReviews')),
+        'reviewCount'      => $this->whenLoaded('approvedReviews', fn () => $this->approvedReviews->count()),
+        'rating'           => $this->whenLoaded('approvedReviews', fn () =>
+            round($this->approvedReviews->avg('rating') ?? 0, 1)
+        ),
+        'ratingBreakdown'  => $this->whenLoaded('approvedReviews', fn () =>
+            collect(range(5, 1))->mapWithKeys(fn ($s) => [
+                $s => $this->approvedReviews->where('rating', $s)->count(),
+            ])->all()
+),
     ];
     }
 

@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\Admin\BrandController as AdminBrandController;
 use App\Http\Controllers\Api\Storefront\BrandController as StorefrontBrandController;
 use App\Http\Controllers\Api\Storefront\NewsletterController;
 use App\Http\Controllers\Api\Storefront\QuoteController;
+use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
+
 
 
 
@@ -69,8 +71,16 @@ Route::prefix('admin')
         Route::patch('products/{product}/stock', [AdminProductController::class, 'adjustStock']);
 
         Route::apiResource('products', AdminProductController::class);
-    });
+            });
 
+            Route::prefix('reviews')->group(function () {
+            Route::get('/', [AdminReviewController::class, 'index']);
+            Route::patch('{review}/approve', [AdminReviewController::class, 'approve']);
+            Route::patch('{review}/hide', [AdminReviewController::class, 'hide']);
+            Route::patch('{review}/reply', [AdminReviewController::class, 'reply']);
+            Route::patch('{review}/verify', [AdminReviewController::class, 'verify']);
+            Route::delete('{review}', [AdminReviewController::class, 'destroy']);
+        });
 
 
 

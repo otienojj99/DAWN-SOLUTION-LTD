@@ -53,14 +53,13 @@ export interface ProductVideo {
 export interface Review {
     id: string;
     author: string;
-    /** 1 to 5. */
-    rating: number;
-    /** ISO date (YYYY-MM-DD). Rendered as an absolute date so server and browser always agree. */
     date: string;
+    rating: number;
     text: string;
     verified?: boolean;
+    adminReply?: string | null;
+    adminRepliedAt?: string | null;
 }
-
 /** Number of reviews per star level, for the summary bars. */
 export type RatingBreakdown = Record<1 | 2 | 3 | 4 | 5, number>;
 

@@ -105,6 +105,19 @@ export function ReviewsPanel({ product, onSubmitReview }: ReviewsPanelProps) {
                                     <Stars rating={review.rating} />
                                 </div>
                                 <p className="text-[14px] leading-relaxed text-[#2B2B2B]">{review.text}</p>
+                                {review.adminReply && (
+        <div className="mt-3 rounded-lg border-l-4 border-[#325A96] bg-[#EAF0F9] px-4 py-3">
+            <p className="mb-1 text-[12px] font-extrabold uppercase tracking-wide text-[#325A96]">
+                Reply from Dawn Solutions
+            </p>
+            <p className="text-[13.5px] leading-relaxed text-[#2B2B2B]">{review.adminReply}</p>
+            {review.adminRepliedAt && (
+                <p className="mt-1.5 text-[11.5px] text-[#5B6470]">
+                    {formatReviewDate(review.adminRepliedAt)}
+                </p>
+            )}
+        </div>
+)}
                             </li>
                         ))}
                     </ul>

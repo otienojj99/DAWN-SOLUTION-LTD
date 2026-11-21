@@ -6,6 +6,7 @@ use App\Models\UseCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
+use App\Services\Cart\CartService;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -37,6 +38,15 @@ class HandleInertiaRequests extends Middleware
      */
   public function share(Request $request): array
 {
+    $cartService = app(CartService::class);
+    $cartPayload = null;
+
+    try {
+    $cart = $cartService->resolve($request);
+    $cartPayload = $cartService->toPayload($cart);
+    } catch (\Throwable $e) {
+        // Session issue on first request — ignore, cart initializes on first add
+    }
     return array_merge(parent::share($request), [
 
         'auth' => [
@@ -90,6 +100,8 @@ class HandleInertiaRequests extends Middleware
                 ->values()
                 ->all()
         ),
+
+        'cart' => $cartPayload,
 
         'flash' => [
             'success' => fn () => $request->session()->get('success'),

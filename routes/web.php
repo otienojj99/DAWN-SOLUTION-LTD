@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Storefront\NewsletterController;
 use App\Http\Controllers\Api\Storefront\QuoteController;
 use App\Http\Controllers\Api\Storefront\ShopController;
+use App\Http\Controllers\Api\Storefront\ReviewController as StorefrontReviewController;
+use App\Http\Controllers\Api\Storefront\CartController;
+
 // Home
 Route::get('/', HomeController::class)->name('home');
 
@@ -28,14 +31,23 @@ Route::middleware(['auth', 'verified'])
         // More admin web routes here as they're built
     });
 
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'show'])->name('show');
+    Route::post('items', [CartController::class, 'add'])->name('items.add');
+    Route::patch('items/{itemId}', [CartController::class, 'updateItem'])->name('items.update');
+    Route::delete('items/{itemId}', [CartController::class, 'removeItem'])->name('items.remove');
+    Route::delete('/', [CartController::class, 'clear'])->name('clear');
+});
+
 Route::post('newsletter/subscribe', [NewsletterController::class, 'store'])
     ->name('newsletter.subscribe');
 
     Route::post('quote-requests', [QuoteController::class, 'store'])
     ->name('quotes.store');
-
+    Route::post('reviews', [StorefrontReviewController::class, 'store'])
+        ->name('reviews.store');
 // Storefront (Inertia pages — public)
-Route::prefix('shop')->name('shop.')->group(function () {
+    Route::prefix('shop')->name('shop.')->group(function () {
 
     // 1. Shop index (must be first — most specific)
     Route::get('/', [ShopController::class, 'index'])->name('index');

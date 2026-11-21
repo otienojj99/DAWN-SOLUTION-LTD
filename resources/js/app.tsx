@@ -1,14 +1,16 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { CommerceProvider } from '@/components/commerce/CommerceProvider';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import type { ServerCart } from '@/types/cart';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-void createInertiaApp({
+void createInertiaApp<{ cart?: ServerCart | null }>({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
@@ -28,10 +30,10 @@ void createInertiaApp({
         }
     },
     strictMode: true,
-    withApp(app) {
+    withApp(app, { page }) {
         return (
             <TooltipProvider delayDuration={0}>
-                {app}
+                <CommerceProvider initialCart={page.props.cart}>{app}</CommerceProvider>
                 <Toaster />
             </TooltipProvider>
         );

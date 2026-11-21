@@ -65,7 +65,7 @@
 //         rating: 4.5,
 //         reviewCount: 44,
 //         inStock: true,
-//     },
+//     // },
 // ];
 
 // /** Looks up a product by id. Throws in dev if a HeroSlide references a bad id — better to fail loudly than silently render a blank slide. */

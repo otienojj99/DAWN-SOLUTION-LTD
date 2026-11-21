@@ -6,6 +6,9 @@ import type { Product } from '@/types/product';
 import { ProductBadge } from './ProductBadge';
 import { RatingStars } from './RatingStars';
 import { WishlistToggle } from './WishlistToggle';
+import { useOptionalCart } from '@/store/cart';
+import { productToCartLine } from '@/lib/cart-items';
+
 
 
 interface ProductCardProps {
@@ -31,12 +34,23 @@ export function ProductCard({ product, onAddToCart, onToggleWishlist, className 
     const lowStock = product.stockCount !== undefined && product.stockCount <= 5;
     const outOfStock = product.inStock === false;
     const currency = product.currency as 'KES' | 'USD' | undefined;
+    const cart = useOptionalCart();
 
     function handleWishlist() {
         const next = !wishlisted;
         setWishlisted(next);
         onToggleWishlist?.(product, next);
     }
+
+    function handleAdd() {
+    if (onAddToCart) {
+        onAddToCart(product);
+        return;
+    }
+    if (cart) {
+        cart.add(productToCartLine(product), 1);
+    }
+}
 
     return (
         <article
@@ -107,7 +121,7 @@ export function ProductCard({ product, onAddToCart, onToggleWishlist, className 
                 <button
                     type="button"
                     disabled={outOfStock}
-                    onClick={() => onAddToCart?.(product)}
+                    onClick={handleAdd}
                     className="mt-auto flex items-center justify-center gap-2 rounded-lg bg-[#325A96] px-3 py-2.5 text-[13px] font-bold text-white transition-colors duration-200 hover:bg-[#FAB40A] hover:text-[#152B4D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#325A96] disabled:cursor-not-allowed disabled:bg-[#C8CED8] disabled:text-white"
                 >
                     <ShoppingCart className="h-4 w-4" aria-hidden="true" />

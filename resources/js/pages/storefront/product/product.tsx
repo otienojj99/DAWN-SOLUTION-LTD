@@ -3,8 +3,11 @@ import { Footer } from '@/components/Footer';
 import { ProductDetailPage } from '@/components/product-detail';
 import { defaultShippingInfo } from '@/data/product-config';
 import type { ProductBadge, ProductSpec } from '@/types/product';
-import type { ProductDetail, VariantGroup } from '@/types/product-detail';
+import type { ProductDetail, VariantGroup, NewReview  } from '@/types/product-detail';
 import type { CategoryNode, ShopProduct } from '@/types/shop';
+import { api } from '@/lib/api';
+
+
 
 interface ProductPageProps {
     product: StorefrontProduct;
@@ -192,6 +195,15 @@ function toProductDetail(product: StorefrontProduct, related: StorefrontProduct[
 }
 
 export default function Product({ product, related }: ProductPageProps) {
+
+   async function handleSubmitReview(review: NewReview): Promise<void> {
+    await api.post('/reviews', {
+        product_id: review.productId,
+        rating:     review.rating,
+        name:       review.name,
+        text:       review.text,
+    });
+}
     const detail = toProductDetail(product, related);
 
     return (
@@ -202,6 +214,7 @@ export default function Product({ product, related }: ProductPageProps) {
                     product={detail}
                     catalogue={related.map(toShopProduct)}
                     tree={categoryTree(product, detail.categoryPath)}
+                    onSubmitReview={handleSubmitReview}
                 />
             </main>
             <Footer />
